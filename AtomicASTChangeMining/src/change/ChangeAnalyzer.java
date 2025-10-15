@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,6 +13,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import graphics.DotGraph;
 import main.MainChangeAnalyzer;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.AmbiguousObjectException;
@@ -250,10 +252,24 @@ public class ChangeAnalyzer {
 						&& csizes[0] <= 100 && csizes[1] <= 100 
 						&& cg.hasMethods()) {
 					// DEBUG
-					/*DotGraph dg = new DotGraph(cg);
-					String dirPath = "D:/temp";
+					DotGraph dg = new DotGraph(cg);
+					File dir = new File(MainChangeAnalyzer.outputPath + "/" + "tmp");
+					if (!dir.exists()){
+						dir.mkdirs();
+					}
+					File dirPath = new File(dir.getAbsolutePath() + "/" + commit.getName());
+					if(!dirPath.exists()){
+						dirPath.mkdirs();
+					}
+					try {
+						if(!Files.exists((new File(dirPath + "/" + "changegraph.dot")).toPath())){
+							Files.createFile((new File(dirPath + "/" + "changegraph.dot")).toPath());
+						}
+					} catch (IOException ex) {
+						throw new RuntimeException(ex);
+					}
 					dg.toDotFile(new File(dirPath + "/" + "changegraph.dot"));
-					dg.toGraphics(dirPath + "/" + "changegraph", "png");*/
+					dg.toGraphics(dirPath + "/" + "changegraph", "png");
 					 
 					HashMap<String, ChangeGraph> cgs = changeGraphs.get(e.getCFile().getPath());
 					if (cgs == null) {
@@ -272,6 +288,7 @@ public class ChangeAnalyzer {
 					dir.mkdirs();
 				FileIO.writeObjectToFile(changeGraphs, dir.getAbsolutePath()
 						+ "/" + commit.getName() + ".dat", false);
+
 				numOfExtractedRevisions++;
 			}
 		}

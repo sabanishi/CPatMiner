@@ -5,7 +5,7 @@ import groum.GROUMGraph;
 import mining.Miner;
 import mining.Pattern;
 
-import org.apache.commons.lang.SystemUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import utils.FileIO;
 import utils.NotifyingBlockingThreadPoolExecutor;
@@ -52,13 +52,10 @@ public class MineChangePatterns {
 		ArrayList<GROUMGraph> allGraphs = new ArrayList<>();
 		HashSet<String> projectNames = new HashSet<String>();
 		String content = null;
-		if(SystemUtils.IS_OS_MAC){
-			content = FileIO.readStringFromFile(reposPath + "/list.csv");
-		} else if (SystemUtils.IS_OS_LINUX) {
-			content = FileIO.readStringFromFile("/home/hoan/github/selected-repos.csv");
-		} else if (SystemUtils.IS_OS_WINDOWS){
-			content = FileIO.readStringFromFile(new File(reposPath).getParentFile().getAbsolutePath() + "/" + new File(reposPath).getName() + ".csv");
-		}
+		changesPath = "/Users/sakugawa99/WebGL/CPatMiner/output";
+		reposPath = "/Users/sakugawa99/WebGL/CPatMiner/repos";
+		content = FileIO.readStringFromFile(reposPath + "/list.csv");
+
 		Scanner sc = new Scanner(content);
 		while (sc.hasNextLine()) {
 //			if (projectNames.size() >= 8000)

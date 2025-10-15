@@ -1,0 +1,31 @@
+<link rel="stylesheet" href="../../../../default.css">
+<script src="../../../../highlight.pack.js"></script> 
+<script>hljs.initHighlightingOnLoad();</script>
+<html><h3>b449477c9af0a1cdeca784439bfc9c17efa17f92,src/main/java/chaa/editscript/ChaaEditScript.java,ChaaEditScript,make,#EditScript#,15
+</h3><h3>Before Change</h3><pre><code class='java'>
+            if(action instanceof com.github.gumtreediff.actions.model.Delete){
+                editScript.addAction(new Delete(action));
+            }else if(action instanceof com.github.gumtreediff.actions.model.Insert) {
+                editScript.<a id="change">addAction(</a><a id="change">new Insert(action</a><a id="change">))</a>;
+            }else if(action instanceof com.github.gumtreediff.actions.model.Move){
+                editScript.addAction(new Move(action));
+            }else if(action instanceof com.github.gumtreediff.actions.model.TreeDelete){
+                editScript.addAction(new Delete(action));
+            }else if(action instanceof com.github.gumtreediff.actions.model.TreeInsert){
+                editScript.<a id="change">addAction(</a><a id="change">new Insert(action</a><a id="change">))</a>;
+            }else if(action instanceof com.github.gumtreediff.actions.model.Update){
+                editScript.addAction(new Update(action));
+            }</code></pre><h3>After Change</h3><pre><code class='java'>
+            if(action instanceof com.github.gumtreediff.actions.model.Delete){
+                editScript.addAction(new Delete((com.github.gumtreediff.actions.model.Delete)action));
+            }else if(action instanceof com.github.gumtreediff.actions.model.Insert) {
+                editScript.<a id="change">addAction(</a><a id="change">new Insert(</a><a id="change">(com.github.gumtreediff.actions.model.Insert)action</a><a id="change">))</a>;
+            }else if(action instanceof com.github.gumtreediff.actions.model.Move){
+                editScript.addAction(new Move((com.github.gumtreediff.actions.model.Move)action));
+            }else if(action instanceof com.github.gumtreediff.actions.model.TreeDelete){
+                editScript.addAction(new Delete((com.github.gumtreediff.actions.model.TreeDelete)action));
+            }else if(action instanceof com.github.gumtreediff.actions.model.TreeInsert){
+                editScript.<a id="change">addAction(</a><a id="change">new Insert(</a><a id="change">(com.github.gumtreediff.actions.model.TreeInsert)action</a><a id="change">))</a>;
+            }else if(action instanceof com.github.gumtreediff.actions.model.Update){
+                editScript.addAction(new Update((com.github.gumtreediff.actions.model.Update)action));
+            }</code></pre>

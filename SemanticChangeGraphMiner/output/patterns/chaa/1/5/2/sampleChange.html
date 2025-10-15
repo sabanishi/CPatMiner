@@ -1,0 +1,30 @@
+<link rel="stylesheet" href="../../../../default.css">
+<script src="../../../../highlight.pack.js"></script> 
+<script>hljs.initHighlightingOnLoad();</script>
+<html><h3>a0b4840cca1946c4dc4107cbaff4522e37985057,src/main/java/jp/ac/titech/c/se/chaa/Main.java,Main,createPatternFromText,#String#String#number#String#,174
+</h3><h3>Before Change</h3><pre><code class='java'>
+            dao.insertFragment(change.getEditScript().toString(), hash(change.getEditScript().toString()));
+            dao.insertPattern(hash(change.getSrc().toString()),hash(change.getEditScript().toString()),hash(change.getSrc().toString())+hash(change.getEditScript().toString()) );
+
+            dao.insertChunk(commitId, filename, chunkInfo.getSrcPosLine(), chunkInfo.getSrcEndPosLine(), chunkInfo.getDstPosLine(), chunkInfo.getDstEndPosLine(),hash(change.<a id="change">getSrc()</a>.<a id="change">toString()</a>)+hash(change.getEditScript().toString() ));
+
+            changeList.add(change);
+</code></pre><h3>After Change</h3><pre><code class='java'>
+            EditScript gumtreeES = subGumTreePair.generateGumTreeES();
+            if(gumtreeES.asList().isEmpty()) continue;
+
+            Change <a id="change">change</a> = new Change(subGumTreePair.getSrc(),gumtreeES,chunkInfo);
+
+            change.patternize();
+
+            log.debug("srcAST\n{}",change.getSrc());
+            log.debug("ES\n{}",change.getEditScript());
+
+            dao.insertFragment(change.getSrc().toString(),change.getSrc().hash());
+            dao.insertFragment(change.getEditScript().toString(), change.getEditScript().hash());
+            dao.insertPattern(change.getSrc().hash(),change.getEditScript().hash(),change.getSrc().hash()+change.getEditScript().hash() );
+
+            dao.insertChunk(commitId, filename, chunkInfo.getSrcPosLine(), chunkInfo.getSrcEndPosLine(), chunkInfo.getDstPosLine(), chunkInfo.getDstEndPosLine(),change.<a id="change">getSrc()</a>.hash()+change.getEditScript().hash() );
+
+            changeList.add(change);
+</code></pre>

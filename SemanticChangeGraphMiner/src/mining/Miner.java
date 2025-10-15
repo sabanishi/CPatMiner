@@ -39,6 +39,7 @@ public class Miner {
 	}
 
 	public String getCurrDir()
+	{
 		return currDir;
 	}
 
@@ -421,7 +422,7 @@ public class Miner {
 	          	sbDigest.append(Integer.toHexString((thedigest[i] & 0xFF) | 0x100).substring(1,3));
 	        	md5s = sbDigest.toString();
 		}
-		String githubLocation = "https://github.com/" + projectName  + "/commit/" + parts[0] + "#diff-" + md5s + "L" + parts[5];
+		String githubLocation = "https://github.com/salab/" + projectName  + "/commit/" + parts[0] + "#diff-" + md5s + "L" + parts[5];
 		
 		sb.append("<BR>");
 		sb.append("<div id='link'><a href='" + githubLocation + "' target='_blank'>Link</a></div>");
