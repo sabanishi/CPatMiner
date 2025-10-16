@@ -557,6 +557,7 @@ public class Miner {
 			HashSet<GROUMNode[]> nodes = nodesOfLabel.get(label);
 			String[] labels = label.split(PAIR_SEPARATOR);
 			if (nodes.size() < Pattern.minFreq
+					// TODO:ここでLLMに問い合わせる
 					|| (!GROUMNode.isCoreAction(labels[0]) && !GROUMNode.isControl(labels[0]))
 					|| (!GROUMNode.isCoreAction(labels[1]) && !GROUMNode.isControl(labels[1])))
 				nodesOfLabel.remove(label);

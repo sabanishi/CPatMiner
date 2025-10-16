@@ -100,7 +100,7 @@ public class GROUMNode {
 		if (node.getLengths() != null)
 			this.lengths = Arrays.copyOf(node.getLengths(), node.getLengths().length);
 		this.dataType = node.getDataType();
-		this.label = String.valueOf(this.astType);;
+		this.label = String.valueOf(this.astType);
 		/*if (node.getAstNodeType() == ASTNode.ARRAY_ACCESS) {
 			this.type = TYPE_ACTION;
 			this.label = "[]";
@@ -108,9 +108,9 @@ public class GROUMNode {
 			this.type = TYPE_ACTION;
 		} else */if (node.getType().equals("a")) {
 			this.type = TYPE_ACTION;
-			if (isInvocation(this.astType))
+			if (isInvocation(this.astType)) {
 				this.label = node.getLabel();
-			else if (this.astType == ASTNode.INFIX_EXPRESSION) {
+			} else if (this.astType == ASTNode.INFIX_EXPRESSION) {
 				char cl = (char) (infixExpressionLables.get(node.getLabel()) + 128);
 				this.label = String.valueOf(cl);
 			} else {
@@ -128,7 +128,40 @@ public class GROUMNode {
 			if (!isLiteral()) {
 				this.astType = ASTNode.SIMPLE_NAME;
 				this.label = String.valueOf(this.astType);
+			}else{
+				System.out.println("Literal node :"+node.getDataName());
 			}
+		}
+
+		if(isLiteral()){
+			this.label = "-";
+		}
+
+		//TODO: ちゃんと実装する
+		// リテラルの値を残すかを選択する
+		/*
+
+		UsefulType type = LLM.request(...);
+		if(type == UsefulType.Value){
+			this.label = node.getDataType()+ "("+node.getDataName()+")"; //リテラルの型と値を残す
+		}else if(type == UsefulType.OnlyType) {
+			this.label = node.getDataType(); //リテラルの型を残す
+		}else{
+			this.label = "-"; //任意のノードとマッチする
+		}
+		 */
+	}
+
+	enum UsefulType{
+		Value,
+		OnlyType,
+		None
+	}
+
+	static class LLM{
+		public static UsefulType request(String prompt){
+			// LLMに問い合わせて、UsefulTypeを返す処理を実装する
+			return UsefulType.Value; // 仮の戻り値
 		}
 	}
 	

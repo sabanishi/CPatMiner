@@ -67,7 +67,7 @@ public class ChangeNode implements Serializable {
 
 	@Override
 	public String toString() {
-		return getLabel();
+		return getLabel() + getType() + "@" + version + "[" + astNodeType + "]" + (dataName != null ? " " + dataType + "(" + dataName + ")" : "");
 	}
 	
 	public static boolean isControl(String label) {

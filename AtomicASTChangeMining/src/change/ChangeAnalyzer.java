@@ -251,6 +251,7 @@ public class ChangeAnalyzer {
 						&& (csizes[0] + csizes[1]) >= 3 
 						&& csizes[0] <= 100 && csizes[1] <= 100 
 						&& cg.hasMethods()) {
+					System.out.println("found:"+commit.getName());
 					// DEBUG
 					DotGraph dg = new DotGraph(cg);
 					File dir = new File(MainChangeAnalyzer.outputPath + "/" + "tmp");
@@ -262,14 +263,14 @@ public class ChangeAnalyzer {
 						dirPath.mkdirs();
 					}
 					try {
-						if(!Files.exists((new File(dirPath + "/" + "changegraph.dot")).toPath())){
-							Files.createFile((new File(dirPath + "/" + "changegraph.dot")).toPath());
+						if(!Files.exists((new File(dirPath + "/" + e.getFullName()+".dot")).toPath())){
+							Files.createFile((new File(dirPath + "/" + e.getFullName()+".dot")).toPath());
 						}
 					} catch (IOException ex) {
 						throw new RuntimeException(ex);
 					}
-					dg.toDotFile(new File(dirPath + "/" + "changegraph.dot"));
-					dg.toGraphics(dirPath + "/" + "changegraph", "png");
+					dg.toDotFile(new File(dirPath + "/" + e.getFullName()+".dot"));
+					dg.toGraphics(dirPath + "/" + e.getFullName(), "png");
 					 
 					HashMap<String, ChangeGraph> cgs = changeGraphs.get(e.getCFile().getPath());
 					if (cgs == null) {
