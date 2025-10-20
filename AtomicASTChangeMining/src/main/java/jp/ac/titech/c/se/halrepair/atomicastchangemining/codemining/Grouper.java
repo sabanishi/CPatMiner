@@ -20,7 +20,7 @@ public class Grouper {
 
 	public void pair() {
 		for (Bucket b : hash.buckets.values()) {
-			ArrayList<Fragment> fragments = new ArrayList<Fragment>(b.fragments);
+			ArrayList<Fragment> fragments = new ArrayList<Fragment>(b.getFragments());
 			for (int i = 0; i < fragments.size() - 1; i++)
 				for (int j = i + 1; j < fragments.size(); j++) {
 					Fragment fi = fragments.get(i);

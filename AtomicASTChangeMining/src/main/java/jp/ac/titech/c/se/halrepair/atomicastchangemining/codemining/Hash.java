@@ -24,15 +24,6 @@ public class Hash {
 	private Collection<? extends Fragment> fragments;
 	HashMap<Integer, Bucket> buckets = new HashMap<>();
 
-	/**
-	 * This method will be used to initialize the hashing parameters
-	 * 
-	 * @param L
-	 *            <= 512
-	 * @param k
-	 *            <= 20
-	 * @param w
-	 */
 	public static void init(int gHash, int uHash, double windowSize, int vSize) {
 		gHashSize = gHash;
 		uHashSize = uHash;
@@ -151,7 +142,7 @@ public class Hash {
 				if (cache.contains(b))
 					continue;
 				if (b.isCovered(f.getBuckets())) {
-					buckets.remove(b.hashcode);
+					buckets.remove(b.hashCode());
 					b.clear();
 					b = null;
 				} else

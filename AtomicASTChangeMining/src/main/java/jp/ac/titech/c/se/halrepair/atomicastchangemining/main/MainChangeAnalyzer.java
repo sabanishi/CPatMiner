@@ -21,8 +21,8 @@ public class MainChangeAnalyzer {
 	};
 	private static NotifyingBlockingThreadPoolExecutor pool = new NotifyingBlockingThreadPoolExecutor(THREAD_POOL_SIZE, THREAD_POOL_SIZE, 15, TimeUnit.SECONDS, 200, TimeUnit.MILLISECONDS, blockingTimeoutCallback);
 
-	public static String inputPath = "/Users/sakugawa99/WebGL/CPatMiner/repos";
-	public static String outputPath = "/Users/sakugawa99/WebGL/CPatMiner/output";
+	public static Path inputPath = Path.of("/Users/sakugawa99/WebGL/CPatMiner/repos");
+	public static Path outputPath = Path.of("/Users/sakugawa99/WebGL/CPatMiner/output");
 	
 	public static void main(String[] args) {
 		String content = null;
@@ -30,25 +30,26 @@ public class MainChangeAnalyzer {
 		if (args.length > 0) {
 			for (int i = 0; i < args.length; i++) {
 				if (args[i].equals("-i")) {
-					inputPath = args[i+1];
+					inputPath = Path.of(args[i+1]);
 				}
 				if (args[i].equals("-o")) {
-					outputPath = args[i+1];
+					outputPath = Path.of(args[i+1]);
 				}
 			}
 		}
 
 		THREAD_POOL_SIZE = 8;
 		pool = new NotifyingBlockingThreadPoolExecutor(THREAD_POOL_SIZE, THREAD_POOL_SIZE, 15, TimeUnit.SECONDS, 200, TimeUnit.MILLISECONDS, blockingTimeoutCallback);
-		Path path = Path.of("../repos/list.csv");
+		Path path = Path.of(inputPath.toString()+ "/" + "list.csv");
 		content = FileIO.readStringFromFile(path.toString());
 
 		Scanner sc = new Scanner(content);
 		while (sc.hasNextLine()) {
 			String line = sc.nextLine();
 			int index = line.indexOf(',');
-			if (index < 0)
+			if (index < 0){
 				index = line.length();
+			}
 			String name = line.substring(0, index);
 			File dir = new File(inputPath + "/" + name);
 			analyze(dir, name);
@@ -60,8 +61,7 @@ public class MainChangeAnalyzer {
 	}
 
 	private static void analyze(final File dir, final String name) {
-		if (!dir.isDirectory())
-			return;
+		if (!dir.isDirectory()) return;
 		File git = new File(dir, ".git");
 		if (git.exists()) {
 			pool.execute(new Runnable() {
@@ -72,14 +72,16 @@ public class MainChangeAnalyzer {
 					String url = dir.getAbsolutePath();
 					ChangeAnalyzer ca = new ChangeAnalyzer(name, -1, url);
 					ca.buildGitConnector();
-					ca.analyzeGit();
-			    	long endProjectTime = System.currentTimeMillis();
-			    	ca.getCproject().setRunningTime(endProjectTime - startProjectTime);
-			    	ca.closeGitConnector();
-					System.out.println("Done " + name + " in " + (endProjectTime - startProjectTime) / 1000 + "s");
+					try{
+						ca.analyzeGit();
+						long endProjectTime = System.currentTimeMillis();
+						ca.getCproject().setRunningTime(endProjectTime - startProjectTime);
+						System.out.println("Done " + name + " in " + (endProjectTime - startProjectTime) / 1000 + "s");
+					}catch(Exception e){
+						ca.closeGitConnector();
+					}
 				}
 			});
 		}
 	}
-
 }

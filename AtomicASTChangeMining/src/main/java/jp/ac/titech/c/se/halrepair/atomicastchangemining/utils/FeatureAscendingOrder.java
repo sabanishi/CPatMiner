@@ -12,8 +12,8 @@ public class FeatureAscendingOrder implements Comparator<ExasFeature>
 	 * Compare two Pair Objects.
 	 * Compares descending.
 	 *
-	 * @param p1 first String to compare
-	 * @param p2 second String to compare
+	 * @param f1 first String to compare
+	 * @param f2 second String to compare
 	 *
 	 * @return +1 if p1<p2, 0 if p1==p2, -1 if p1>p2
 	 */

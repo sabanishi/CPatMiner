@@ -176,11 +176,9 @@ public class ChangeAnalyzer {
         try {
             ObjectId head = this.gitConn.getRepository().resolve(Constants.HEAD);
             commits = this.gitConn.getGit().log().add(head).call();
-        } catch (GitAPIException e) {
+        } catch (GitAPIException | RuntimeException e) {
             System.err.println(e.getMessage());
-        } catch (RuntimeException e) {
-            System.err.println(e.getMessage());
-        } catch (IOException e) {
+        } catch (Exception e){
             e.printStackTrace();
         }
 
