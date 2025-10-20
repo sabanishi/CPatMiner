@@ -140,7 +140,6 @@ public class GROUMNode {
 		//TODO: ちゃんと実装する
 		// リテラルの値を残すかを選択する
 		/*
-
 		UsefulType type = LLM.request(...);
 		if(type == UsefulType.Value){
 			this.label = node.getDataType()+ "("+node.getDataName()+")"; //リテラルの型と値を残す
@@ -150,19 +149,6 @@ public class GROUMNode {
 			this.label = "-"; //任意のノードとマッチする
 		}
 		 */
-	}
-
-	enum UsefulType{
-		Value,
-		OnlyType,
-		None
-	}
-
-	static class LLM{
-		public static UsefulType request(String prompt){
-			// LLMに問い合わせて、UsefulTypeを返す処理を実装する
-			return UsefulType.Value; // 仮の戻り値
-		}
 	}
 	
 	public GROUMNode(GROUMNode node) {
