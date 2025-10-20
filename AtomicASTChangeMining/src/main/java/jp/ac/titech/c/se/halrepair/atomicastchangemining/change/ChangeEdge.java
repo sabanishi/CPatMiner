@@ -5,37 +5,37 @@ import java.io.Serializable;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.pdg.graph.PDGEdge;
 
 public class ChangeEdge implements Serializable {
-	private static final long serialVersionUID = -6490730732956992708L;
+    private static final long serialVersionUID = -6490730732956992708L;
 
-	ChangeNode source, target;
-	String label;
+    ChangeNode source, target;
+    String label;
 
-	public ChangeEdge(ChangeNode source, ChangeNode target, PDGEdge e) {
-		this.source = source;
-		this.target = target;
-		this.label = e.getExasLabel();
-		source.outEdges.add(this);
-		target.inEdges.add(this);
-	}
+    public ChangeEdge(ChangeNode source, ChangeNode target, PDGEdge e) {
+        this.source = source;
+        this.target = target;
+        this.label = e.getExasLabel();
+        source.getOutEdges().add(this);
+        target.getInEdges().add(this);
+    }
 
-	public ChangeNode getSource() {
-		return source;
-	}
+    public ChangeNode getSource() {
+        return source;
+    }
 
-	public ChangeNode getTarget() {
-		return target;
-	}
+    public ChangeNode getTarget() {
+        return target;
+    }
 
-	public String getLabel() {
-		return label;
-	}
+    public String getLabel() {
+        return label;
+    }
 
-	public boolean isMapped() {
-		return label.equals("_map_");
-	}
+    public boolean isMapped() {
+        return label.equals("_map_");
+    }
 
-	@Override
-	public String toString() {
-		return label;
-	}
+    @Override
+    public String toString() {
+        return label;
+    }
 }

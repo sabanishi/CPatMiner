@@ -9,109 +9,107 @@ import java.util.Map;
 import org.eclipse.jdt.core.dom.ASTNode;
 
 public abstract class ChangeEntity implements Serializable {
-	private static final long serialVersionUID = 4628877646311034500L;
+    private static final long serialVersionUID = 4628877646311034500L;
 
-	public enum Type {
-		Unchanged, Deleted, Added, Modified, Modified_Modifiers, Modified_Name, Modified_Body
-	}
+    public enum Type {
+        Unchanged, Deleted, Added, Modified
+    }
 
-	protected static int thresholdDistance = 20;
-	
-	protected int startLine = -1;
-	private Type cType = Type.Unchanged;
-	protected HashMap<Integer, Integer> vector;
-	protected int vectorLength = 0;
-	protected HashMap<ASTNode, ArrayList<ASTNode>> tree;
-	int numOfLOCs = 0, numOfNonCommentLOCs = 0, numOfAstNodes = 0,
-			numOfChangeLOCs = 0, numOfChangeAstNodes = 0, numOfChangeTrees = 0;
+    protected int startLine = -1;
+    private Type cType = Type.Unchanged;
+    protected HashMap<Integer, Integer> vector;
+    protected int vectorLength = 0;
+    protected HashMap<ASTNode, ArrayList<ASTNode>> tree;
 
-	protected Type getCType() {
-		return cType;
-	}
+    int numOfLOCs = 0;
+    int numOfNonCommentLOCs = 0;
+    int numOfAstNodes = 0;
+    int numOfChangeLOCs = 0;
+    int numOfChangeAstNodes = 0;
+    int numOfChangeTrees = 0;
 
-	protected void setCType(Type type) {
-		this.cType = type;
-	}
+    protected Type getCType() {
+        return cType;
+    }
 
-	protected void computeVectorLength() {
-		this.vectorLength = 0;
-		for (int key : vector.keySet())
-			this.vectorLength += vector.get(key);
-	}
+    protected void setCType(Type type) {
+        this.cType = type;
+    }
 
-	protected Map<Integer, Integer> getVector() {
-		return this.vector;
-	}
+    protected void computeVectorLength() {
+        this.vectorLength = 0;
+        for (int key : vector.keySet())
+            this.vectorLength += vector.get(key);
+    }
 
-	protected int getVectorLength() {
-		return this.vectorLength;
-	}
+    protected Map<Integer, Integer> getVector() {
+        return this.vector;
+    }
 
-	public int getNumOfLOCs() {
-		return numOfLOCs;
-	}
+    protected int getVectorLength() {
+        return this.vectorLength;
+    }
 
-	public int getNumOfNonCommentLOCs() {
-		return numOfNonCommentLOCs;
-	}
+    public int getNumOfLOCs() {
+        return numOfLOCs;
+    }
 
-	public int getNumOfAstNodes() {
-		return numOfAstNodes;
-	}
+    public int getNumOfNonCommentLOCs() {
+        return numOfNonCommentLOCs;
+    }
 
-	public int getNumOfChangeLOCs() {
-		return numOfChangeLOCs;
-	}
+    public int getNumOfAstNodes() {
+        return numOfAstNodes;
+    }
 
-	public int getNumOfChangeAstNodes() {
-		return numOfChangeAstNodes;
-	}
+    public int getNumOfChangeLOCs() {
+        return numOfChangeLOCs;
+    }
 
-	public int getNumOfChangeTrees() {
-		return numOfChangeTrees;
-	}
+    public int getNumOfChangeAstNodes() {
+        return numOfChangeAstNodes;
+    }
 
-	protected double computeVectorSimilarity(ChangeEntity other) {
-		HashMap<Integer, Integer> v1 = new HashMap<Integer, Integer>(
-				this.vector);
-		HashMap<Integer, Integer> v2 = new HashMap<Integer, Integer>(
-				other.getVector());
-		HashSet<Integer> keys = new HashSet<Integer>(v1.keySet());
-		keys.retainAll(v2.keySet());
+    public int getNumOfChangeTrees() {
+        return numOfChangeTrees;
+    }
 
-		int commonSize = 0;
-		for (int key : keys) {
-			commonSize += Math.min(v1.get(key), v2.get(key));
-		}
-		return commonSize * 2.0 / (this.vectorLength + other.getVectorLength());
-	}
+    protected double computeVectorSimilarity(ChangeEntity other) {
+        HashMap<Integer, Integer> v1 = new HashMap<Integer, Integer>(this.vector);
+        HashMap<Integer, Integer> v2 = new HashMap<Integer, Integer>(other.getVector());
+        HashSet<Integer> keys = new HashSet<Integer>(v1.keySet());
+        keys.retainAll(v2.keySet());
 
-	abstract public String getName();
+        int commonSize = 0;
+        for (int key : keys) {
+            commonSize += Math.min(v1.get(key), v2.get(key));
+        }
+        return commonSize * 2.0 / (this.vectorLength + other.getVectorLength());
+    }
 
-	abstract public CFile getCFile();
+    abstract public String getName();
 
-	public ChangeEntity getMappedEntity() {
-		if (this instanceof CClass)
-			return ((CClass) this).getMappedClass();
-		if (this instanceof CField)
-			return ((CField) this).getMappedField();
-		if (this instanceof CMethod)
-			return ((CMethod) this).getMappedMethod();
-		return null;
-	}
+    abstract public CFile getCFile();
 
-	abstract public String getQualName();
+    public ChangeEntity getMappedEntity() {
+        if (this instanceof CClass) return ((CClass) this).getMappedClass();
+        if (this instanceof CField) return ((CField) this).getMappedField();
+        if (this instanceof CMethod) return ((CMethod) this).getMappedMethod();
+        return null;
+    }
 
-	abstract public CClass getCClass();
+    abstract public String getQualName();
 
-	void cleanForStats() {
-		if (this.tree != null) {
-			this.tree.clear();
-			this.tree = null;
-		}
-		if (this.vector != null) {
-			this.vector.clear();
-			this.vector = null;
-		}
-	}
+    abstract public CClass getCClass();
+
+    void cleanForStats() {
+        if (this.tree != null) {
+            this.tree.clear();
+            this.tree = null;
+        }
+        if (this.vector != null) {
+            this.vector.clear();
+            this.vector = null;
+        }
+    }
 }
