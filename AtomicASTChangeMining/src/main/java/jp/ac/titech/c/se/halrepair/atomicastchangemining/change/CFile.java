@@ -22,7 +22,10 @@ public class CFile extends ChangeEntity {
     private CFile mappedFile;
     private CompilationUnit compileUnit;
 
+    private String content;
+
     public CFile(RevisionAnalyzer revisionAnalyzer, String filePath, String content) {
+        this.content = content;
         this.startLine = 0;
         this.cRevisionAnalyzer = revisionAnalyzer;
         this.path = filePath;
@@ -94,6 +97,10 @@ public class CFile extends ChangeEntity {
     @Override
     public CClass getCClass() {
         return null;
+    }
+
+    public String getContent() {
+        return content;
     }
 
     public void computeSimilarity(CFile otherFile) {

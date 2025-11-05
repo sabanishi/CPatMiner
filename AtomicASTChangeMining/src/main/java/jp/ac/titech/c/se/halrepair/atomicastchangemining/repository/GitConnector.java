@@ -41,6 +41,11 @@ public class GitConnector extends AbstractConnector {
 		this.url = url;
 	}
 
+	// ダミー用リポジトリを渡す場合のコンストラクタ
+	public GitConnector(Repository repository){
+		this.repository = repository;
+	}
+
 	public int getNumberOfCommits() {
 		return numberOfCommits;
 	}
@@ -52,12 +57,14 @@ public class GitConnector extends AbstractConnector {
 	public boolean connect() {
 		FileRepositoryBuilder builder = new FileRepositoryBuilder();
 		try {
-			repository = builder.setGitDir(new File(url)).readEnvironment() // scan
-																			// environment
-																			// GIT_*
-																			// variables
-					.findGitDir() // scan up the file system tree
-					.build();
+			if(url != null && repository == null){
+				repository = builder.setGitDir(new File(url)).readEnvironment() // scan
+																				// environment
+																				// GIT_*
+																				// variables
+						.findGitDir() // scan up the file system tree
+						.build();
+			}
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
 			return false;

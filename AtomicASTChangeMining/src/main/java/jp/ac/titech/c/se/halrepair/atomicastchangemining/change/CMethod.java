@@ -48,6 +48,9 @@ public class CMethod extends ChangeEntity {
     private HashSet<String> literals = new HashSet<String>();
     private HashMap<SimpleName, HashSet<SimpleName>> localVarLocs;
 
+    // メソッドの内容
+    private String rawText;
+
     @SuppressWarnings("unchecked")
     public CMethod(CClass cClass, MethodDeclaration method) {
         this.startLine = ((CompilationUnit) method.getRoot()).getLineNumber(method.getBody().getStartPosition());
@@ -85,6 +88,9 @@ public class CMethod extends ChangeEntity {
         this.vector = new HashMap<Integer, Integer>((HashMap<Integer, Integer>) method.getProperty(VectorVisitor.propertyVector));
         method.setProperty(VectorVisitor.propertyVector, null);
         computeVectorLength();
+
+        this.rawText = cClass.getRawText().substring(method.getStartPosition(),
+                method.getStartPosition() + method.getLength());
     }
 
     public int getModifiers() {
@@ -470,6 +476,10 @@ public class CMethod extends ChangeEntity {
         PDGGraph pdg2 = new PDGGraph(this.mappedMethod.declaration, new PDGBuildingContext(repository, commit, this.mappedMethod.getCFile().getPath(), false));
         pdg2.buildChangeGraph(1);
         pdg2.buildChangeGraph(pdg1);
-        return new ChangeGraph(pdg2);
+
+        CASTNode beforeAST = new CRootASTNode(this.rawText, this.declaration,0);
+        CASTNode afterAST = new CRootASTNode(this.mappedMethod.rawText, this.mappedMethod.declaration,1);
+
+        return new ChangeGraph(pdg2, beforeAST, afterAST);
     }
 }

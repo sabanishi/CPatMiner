@@ -11,11 +11,14 @@ import jp.ac.titech.c.se.halrepair.atomicastchangemining.pdg.graph.PDGNode;
 import org.eclipse.jdt.core.dom.ASTNode;
 
 public class ChangeGraph implements Serializable {
-    private static final long serialVersionUID = -874502848659906533L;
+    private static final long serialVersionUID = -974502848659906533L;
 
     private final HashSet<ChangeNode> nodes = new HashSet<>();
 
-    public ChangeGraph(PDGGraph pdg) {
+    private CASTNode beforeAST = null;
+    private CASTNode afterAST = null;
+
+    public ChangeGraph(PDGGraph pdg, CASTNode beforeAST, CASTNode afterAST) {
         HashSet<PDGNode> changedNodes = pdg.getChangedNodes();
         if (changedNodes.isEmpty()) return;
         HashMap<PDGNode, ChangeNode> map = new HashMap<>();
@@ -33,10 +36,20 @@ public class ChangeGraph implements Serializable {
                 }
             }
         }
+
+        this.beforeAST = beforeAST;
+        this.afterAST = afterAST;
     }
 
     public HashSet<ChangeNode> getNodes() {
         return nodes;
+    }
+    public CASTNode getBeforeAST() {
+        return beforeAST;
+    }
+
+    public CASTNode getAfterAST() {
+        return afterAST;
     }
 
     public boolean isMultiGraph() {

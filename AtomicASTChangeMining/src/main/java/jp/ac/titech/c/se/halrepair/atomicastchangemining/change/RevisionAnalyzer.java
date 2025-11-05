@@ -236,6 +236,7 @@ public class RevisionAnalyzer {
                 System.err.println(e.getMessage());
             }
 
+
             if (diffs == null) {
                 rw.close();
                 df.close();

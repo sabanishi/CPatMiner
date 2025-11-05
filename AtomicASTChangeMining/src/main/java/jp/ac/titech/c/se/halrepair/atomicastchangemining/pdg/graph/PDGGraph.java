@@ -105,6 +105,7 @@ public class PDGGraph implements Serializable {
 		entryNode = new PDGEntryNode(md, ASTNode.METHOD_DECLARATION, "START");
 		nodes.add(entryNode);
 		statementNodes.add(entryNode);
+		// メソッドの引数を調べる
 		for (int i = 0; i < md.parameters().size(); i++) {
 			SingleVariableDeclaration d = (SingleVariableDeclaration) md
 					.parameters().get(i);

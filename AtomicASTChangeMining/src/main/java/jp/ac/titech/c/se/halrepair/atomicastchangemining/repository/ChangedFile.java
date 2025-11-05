@@ -9,5 +9,4 @@ public class ChangedFile {
 		this.oldPath = oldPath;
 		this.oldContent = oldContent;
 	}
-
 }

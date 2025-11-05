@@ -114,6 +114,11 @@ public class ChangeAnalyzer {
         this.gitConn.connect();
     }
 
+    public void setDummyGitConnector(GitConnector gitConn){
+        this.gitConn = gitConn;
+        this.gitConn.connect();
+    }
+
     public void closeGitConnector() {
         this.gitConn.close();
     }
@@ -198,7 +203,7 @@ public class ChangeAnalyzer {
         this.cproject.numOfAllRevisions = this.numOfRevisions;
     }
 
-    private void analyzeGit(RevCommit commit) {
+    public void analyzeGit(RevCommit commit) {
         this.numOfRevisions++;
         if (this.numOfRevisions % 1000 == 0) {
             System.out.println("Analyzing revision: " + this.numOfRevisions + " " + commit.getName() + " from " + projectName);

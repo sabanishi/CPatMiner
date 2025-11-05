@@ -228,6 +228,10 @@ public class CClass extends ChangeEntity {
         return fieldTypes;
     }
 
+    public String getRawText(){
+        return cFile.getContent();
+    }
+
     public double computeSimilarity(CClass otherClass, boolean inMapped) {
         double commonSize = 0, totalSize = 0;
         HashSet<CMethod> methodsM = new HashSet<CMethod>(this.methods), methodsN = new HashSet<CMethod>(otherClass.getMethods());
