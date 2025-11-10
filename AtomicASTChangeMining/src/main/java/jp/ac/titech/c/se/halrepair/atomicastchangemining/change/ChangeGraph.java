@@ -39,6 +39,30 @@ public class ChangeGraph implements Serializable {
 
         this.beforeAST = beforeAST;
         this.afterAST = afterAST;
+
+        // PDGノードとASTノードの対応付けを行う
+        for(ChangeNode pdgNode : nodes){
+            CASTNode root = null;
+            if(pdgNode.getVersion() == 0){
+                root = this.beforeAST;
+            }else if(pdgNode.getVersion() == 1){
+                root = this.afterAST;
+            }
+            CASTNode cAstNode = searchCASTNode(root, pdgNode.getStartPos(), pdgNode.getLength());
+
+            assert cAstNode != null : "No corresponding CASTNode found for PDGNode: " + pdgNode;
+            pdgNode.setAstId(cAstNode.getId());
+        }
+    }
+
+    private CASTNode searchCASTNode(CASTNode node, int startPos, int length){
+        for(CASTNode child  : node.preOrder()){
+            if(child.getStartPosition() == startPos && child.getLength() == length){
+                return child;
+            }
+        }
+
+        return null;
     }
 
     public HashSet<ChangeNode> getNodes() {

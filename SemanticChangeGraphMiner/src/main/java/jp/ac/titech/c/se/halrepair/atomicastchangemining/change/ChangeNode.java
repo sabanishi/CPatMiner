@@ -12,14 +12,16 @@ public class ChangeNode implements Serializable {
 	public static final int STATUS_DELETED = 4;
 	public static final int STATUS_ADDED = 5;
 	public static final int STATUS_MOVED = 6;
+
+	// CASTNodeのIDに対応している
+	private int atsId = -1;
+	// ASTとの対応位置用変数
+	private int startPos;
+	private int length;
 	
 	private int astNodeType;
 	private int changeType = -1;
 	private int version = -1;
-
-	// ASTとの対応位置用変数
-	private int startPos;
-	private int length;
 
 	private int[] starts, lengths;
 	private String type, label;
@@ -69,6 +71,9 @@ public class ChangeNode implements Serializable {
 
 	public String getLabel() {
 		return label;
+	}
+	public int getAtsId() {
+		return atsId;
 	}
 
 	public int getStartPos() {

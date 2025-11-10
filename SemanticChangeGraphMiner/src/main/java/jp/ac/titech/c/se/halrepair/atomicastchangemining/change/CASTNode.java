@@ -62,4 +62,32 @@ public class CASTNode implements Serializable {
         }
         return sb.toString();
     }
+
+    public Iterable<CASTNode> preOrder(){
+        List<CASTNode> nodes = new ArrayList<>();
+        return preOrderHelper(nodes);
+    }
+
+    private Iterable<CASTNode> preOrderHelper(List<CASTNode> list){
+        list.add(this);
+        for(CASTNode child : children){
+            child.preOrderHelper(list);
+        }
+        return list;
+    }
+
+    public CASTNode getChild(int index){
+        if(index == this.id){
+            return this;
+        }
+
+        for(CASTNode child : children){
+            CASTNode result = child.getChild(index);
+            if(result != null){
+                return result;
+            }
+        }
+
+        return null;
+    }
 }

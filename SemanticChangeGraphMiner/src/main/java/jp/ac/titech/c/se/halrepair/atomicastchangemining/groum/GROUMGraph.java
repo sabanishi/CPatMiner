@@ -37,8 +37,8 @@ public class GROUMGraph {
 			}else if(node.getVersion() == 1){
 				root = pdg.getAfterAST();
 			}
-			CASTNode cAstNode = searchCASTNode(root, node.getStartPos(), node.getLength());
 
+			CASTNode cAstNode = root.getChild(node.getAtsId());
 			GROUMNode cn = new GROUMNode(node, cAstNode);
 			cn.setGraph(this);
 			map.put(node, cn);
@@ -52,20 +52,6 @@ public class GROUMGraph {
 		}
 	}
 
-	private CASTNode searchCASTNode(CASTNode node, int startPos, int length){
-		if(node.getStartPosition() == startPos && node.getLength() == length){
-			return node;
-		}
-
-		for(CASTNode child  : node.getChildren()){
-			CASTNode result = searchCASTNode(child, startPos, length);
-			if(result != null){
-				return result;
-			}
-		}
-
-		return null;
-	}
 
 	public GROUMGraph(Fragment f) {
 		this.name = f.getGraph().getName();

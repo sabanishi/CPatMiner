@@ -14,19 +14,37 @@ import org.eclipse.jdt.core.dom.*;
 public class ChangeNode implements Serializable {
     private static final long serialVersionUID = 1416981239324616711L;
 
-    private int id = -1;
-    private final int astNodeType;
-    private int changeType = -1;
-    private int version = -1;
+    // CASTNodeのIDに対応している
+    private int atsId = -1;
     // ASTとの対応位置用変数
     private int startPos;
     private int length;
+
+    private final int astNodeType;
+    private int changeType = -1;
+    private int version = -1;
 
     private int[] starts, lengths;
     private String type, label;
     private final String dataType, dataName;
 
     private final ArrayList<ChangeEdge> inEdges = new ArrayList<>(), outEdges = new ArrayList<>();
+
+    public void setAstId(int atsId) {
+    	this.atsId = atsId;
+    }
+
+    public int getAtsId() {
+    	return atsId;
+    }
+
+    public int getStartPos() {
+        return startPos;
+    }
+
+    public int getLength() {
+        return length;
+    }
 
     public ChangeNode(PDGNode node) {
         this.astNodeType = node.getAstNodeType();

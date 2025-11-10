@@ -42,9 +42,14 @@ public class CreateGraphTest {
         HashMap<String, HashMap<String, ChangeGraph>> changeGraphs = new HashMap<>();
         for (CMethod e : ra.getMappedMethodsM()) {
             ChangeGraph cg = e.getChangeGraph(repo, commit);
-            System.out.println( cg.getBeforeAST().printTree());
 
-            System.out.println(cg.getAfterAST().printTree());
+            // AST出力
+            //System.out.println( cg.getBeforeAST().printTree());
+            //System.out.println(cg.getAfterAST().printTree());
+
+            for(ChangeNode node: cg.getNodes()){
+                System.out.println("node: "+node.getAtsId());
+            }
 
             DotGraph dg = new DotGraph(cg);
             if (!Files.exists((new File( "/Users/sakugawa99/WebGL/" + e.getFullName() + ".dot")).toPath())) {

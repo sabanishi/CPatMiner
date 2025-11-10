@@ -28,6 +28,14 @@ public class CASTNode implements Serializable {
         return originalNode;
     }
 
+    public int getStartPosition(){
+        return pos;
+    }
+
+    public int getLength(){
+        return length;
+    }
+
     public CASTNode(CASTNode parent, ASTNode node){
         this.parent = parent;
         this.pos = node.getStartPosition();
@@ -440,5 +448,20 @@ public class CASTNode implements Serializable {
             child.preOrderHelper(list);
         }
         return list;
+    }
+
+    public CASTNode getChild(int index){
+        if(index == this.id){
+            return this;
+        }
+
+        for(CASTNode child : children){
+            CASTNode result = child.getChild(index);
+            if(result != null){
+                return result;
+            }
+        }
+
+        return null;
     }
 }
