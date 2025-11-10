@@ -1,5 +1,6 @@
 package jp.ac.titech.c.se.halrepair.atomicastchangemining.change;
 
+import jp.ac.titech.c.se.halrepair.atomicastchangemining.graphics.DotGraph;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.repository.GitConnector;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.utils.JavaASTUtil;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.utils.TestUtil;
@@ -11,7 +12,9 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.junit.Test;
 
+import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 
 public class CreateGraphTest {
@@ -40,6 +43,15 @@ public class CreateGraphTest {
         for (CMethod e : ra.getMappedMethodsM()) {
             ChangeGraph cg = e.getChangeGraph(repo, commit);
             System.out.println( cg.getBeforeAST().printTree());
+
+            System.out.println(cg.getAfterAST().printTree());
+
+            DotGraph dg = new DotGraph(cg);
+            if (!Files.exists((new File( "/Users/sakugawa99/WebGL/" + e.getFullName() + ".dot")).toPath())) {
+                Files.createFile((new File( "/Users/sakugawa99/WebGL/" + e.getFullName() + ".dot")).toPath());
+            }
+            dg.toDotFile(new File( "/Users/sakugawa99/WebGL/" + e.getFullName() + ".dot"));
+            dg.toGraphics("/Users/sakugawa99/WebGL/" + e.getFullName(),"png");
         }
 
         /*

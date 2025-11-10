@@ -97,6 +97,7 @@ public class GROUMNode {
 
 	public GROUMNode(ChangeNode node, CASTNode cAstNode) {
 		this.cAstNode = cAstNode;
+		this.cAstNode.setNormalizedLabel(this.cAstNode.getLabel());
 		this.changeType = node.getChangeType();
 		this.version = node.getVersion();
 		this.astType = (char) node.getAstNodeType();
@@ -115,6 +116,7 @@ public class GROUMNode {
 				if (isInvocation(this.astType)) {
 					// メソッド呼び出しの場合
 					this.label = node.getDataName() + "(" + this.getDataType() + ")";
+					this.cAstNode.setNormalizedLabel(this.label);
 					this.isNormalized = true;
 				} else if (this.astType == ASTNode.INFIX_EXPRESSION) {
 					char cl = (char) (infixExpressionLables.get(node.getLabel()) + 128);
@@ -137,10 +139,12 @@ public class GROUMNode {
 				if (isLiteral()) {
 					// リテラルの場合
 					this.label = String.valueOf(this.astType);
+					this.cAstNode.setNormalizedLabel(this.label);
 				}else{
 					// 変数の場合
 					this.astType = ASTNode.SIMPLE_NAME;
 					this.label = String.valueOf(this.astType);
+					this.cAstNode.setNormalizedLabel(this.label);
 				}
 				break;
 			default:

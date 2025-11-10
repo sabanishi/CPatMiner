@@ -6,17 +6,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import com.github.gumtreediff.matchers.CompositeMatchers;
+import com.github.gumtreediff.matchers.MappingStore;
+import com.github.gumtreediff.matchers.Matchers;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.pdg.graph.PDGBuildingContext;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.pdg.graph.PDGGraph;
+import jp.ac.titech.c.se.halrepair.atomicastchangemining.treed.TreedConstants;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.treed.TreedMapper;
-import org.eclipse.jdt.core.dom.ASTMatcher;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.MarkerAnnotation;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.SimpleName;
-import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+import jp.ac.titech.c.se.halrepair.atomicastchangemining.treed.TreedUtils;
+import org.eclipse.jdt.core.dom.*;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 
@@ -477,8 +475,32 @@ public class CMethod extends ChangeEntity {
         pdg2.buildChangeGraph(1);
         pdg2.buildChangeGraph(pdg1);
 
-        CASTNode beforeAST = new CRootASTNode(this.rawText, this.declaration,0);
-        CASTNode afterAST = new CRootASTNode(this.mappedMethod.rawText, this.mappedMethod.declaration,1);
+        CASTNode beforeAST = new CRootASTNode(this.rawText, this.declaration);
+        CASTNode afterAST = new CRootASTNode(this.mappedMethod.rawText, this.mappedMethod.declaration);
+
+        // 2つのノードのマッピングを行う
+        TreedMapper mapper = new TreedMapper(this.declaration, this.mappedMethod.declaration);
+        mapper.map(true);
+        int currentId = 0;
+        for(CASTNode node : beforeAST.preOrder()){
+            node.setId(currentId);
+            ASTNode mappedNode = (ASTNode)node.getOriginalNode().getProperty(TreedConstants.PROPERTY_MAP);
+            if(mappedNode != null){
+                CASTNode afterNode = (CASTNode) mappedNode.getProperty(TreedConstants.PROPERTY_C_NODE);
+                if(afterNode!= null){
+                    afterNode.setId(currentId);
+                }
+            }
+            currentId++;
+        }
+
+        // 対応づかなかったノードにIDを振る
+        for(CASTNode node : afterAST.preOrder()){
+            if(node.getId() == -1){
+                node.setId(currentId);
+                currentId++;
+            }
+        }
 
         return new ChangeGraph(pdg2, beforeAST, afterAST);
     }

@@ -3,6 +3,7 @@ package jp.ac.titech.c.se.halrepair.atomicastchangemining.treed;
 public interface TreedConstants {
 	static final String PROPERTY_MAP = "m";
 	static final String PROPERTY_STATUS = "s";
+	static final String PROPERTY_C_NODE = "c";
 	
 	static final int GRAM_MAX_LENGTH = 2;
 	static final int MIN_HEIGHT = 2;

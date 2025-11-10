@@ -16,6 +16,7 @@ public class GROUMGraph {
 	public static int nextId = 1;
 	private int id, patternId = -1;
 	private String project, name;
+	private ChangeGraph changeGraph;
 	private HashSet<GROUMNode> nodes = new HashSet<GROUMNode>();
 	
 	public GROUMGraph() {
@@ -24,6 +25,7 @@ public class GROUMGraph {
 	
 	public GROUMGraph(ChangeGraph pdg, String name) {
 		this.name = name;
+		this.changeGraph = pdg;
 		HashSet<ChangeNode> changedNodes = pdg.getNodes();
 		if (changedNodes.isEmpty()) return;
 		HashMap<ChangeNode, GROUMNode> map = new HashMap<>();
@@ -203,6 +205,9 @@ public class GROUMGraph {
 
 	public HashSet<GROUMNode> getNodes() {
 		return nodes;
+	}
+	public ChangeGraph getChangeGraph() {
+		return changeGraph;
 	}
 
 	public void pruneDoubleEdges() {

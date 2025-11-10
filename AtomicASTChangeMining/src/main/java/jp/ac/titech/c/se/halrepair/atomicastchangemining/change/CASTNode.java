@@ -1,5 +1,6 @@
 package jp.ac.titech.c.se.halrepair.atomicastchangemining.change;
 
+import jp.ac.titech.c.se.halrepair.atomicastchangemining.treed.TreedConstants;
 import org.eclipse.jdt.core.dom.*;
 
 import java.io.Serializable;
@@ -7,6 +8,7 @@ import java.util.*;
 
 public class CASTNode implements Serializable {
     private static final long serialVersionUID = 1L;
+    // NOTE: IDはコンストラクタでは振られず、変更前後のASTを構築したあとにマッピングされる
     private int id = -1;
     private int pos = -1;
     private int length = -1;
@@ -14,13 +16,26 @@ public class CASTNode implements Serializable {
     private CASTNode parent = null;
     private int type = -1;
     private String label = "";
+    private ASTNode originalNode = null;
 
-    public CASTNode(CASTNode parent, ASTNode node, int id){
-        this.parent = parent;
+    public void setId(int id){
         this.id = id;
+    }
+    public int getId(){
+        return id;
+    }
+    public ASTNode getOriginalNode(){
+        return originalNode;
+    }
+
+    public CASTNode(CASTNode parent, ASTNode node){
+        this.parent = parent;
         this.pos = node.getStartPosition();
         this.length = node.getLength();
         this.type = node.getNodeType();
+        this.originalNode = node;
+        // 元のASTノードに自身の参照を追加しておく
+        node.setProperty(TreedConstants.PROPERTY_C_NODE, this);
 
         switch(node.getNodeType()) {
             // ======== リテラル / 名前 ========
@@ -371,16 +386,14 @@ public class CASTNode implements Serializable {
                 // 単一の子ノード
                 if (value instanceof ASTNode) {
                     ASTNode child = (ASTNode) value;
-                    int childId = this.id;
-                    this.children.add(new CASTNode(this, child, childId));
+                    this.children.add(new CASTNode(this, child));
                 }
             } else if (prop instanceof ChildListPropertyDescriptor) {
                 // 複数子ノードのリスト
                 @SuppressWarnings("unchecked")
                 List<ASTNode> list = (List<ASTNode>) value;
                 for (ASTNode child : list) {
-                    int childId = this.id;
-                    this.children.add(new CASTNode(this, child, childId));
+                    this.children.add(new CASTNode(this, child));
                 }
             }
         }
@@ -414,5 +427,18 @@ public class CASTNode implements Serializable {
             sb.append(child.printTree(depth + 1));
         }
         return sb.toString();
+    }
+
+    public Iterable<CASTNode> preOrder(){
+        List<CASTNode> nodes = new ArrayList<>();
+        return preOrderHelper(nodes);
+    }
+
+    private Iterable<CASTNode> preOrderHelper(List<CASTNode> list){
+        list.add(this);
+        for(CASTNode child : children){
+            child.preOrderHelper(list);
+        }
+        return list;
     }
 }

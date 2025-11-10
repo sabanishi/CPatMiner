@@ -7,8 +7,8 @@ public class CRootASTNode extends CASTNode{
 
     private String rawText;
 
-    public CRootASTNode(String rawText, ASTNode node, int id){
-        super(null, node, id);
+    public CRootASTNode(String rawText, ASTNode node){
+        super(null, node);
         this.rawText = rawText;
     }
 

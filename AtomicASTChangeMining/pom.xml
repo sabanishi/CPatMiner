@@ -13,7 +13,6 @@
 	</properties>
 
 	<build>
-		<!-- 標準構成: src/main/java, src/test/java を自動認識するため sourceDirectory は指定不要 -->
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -24,7 +23,6 @@
 				</configuration>
 			</plugin>
 
-			<!-- 念のため（maven.test.skip で十分だが、二重保険として） -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -107,8 +105,18 @@
 			<artifactId>org.eclipse.jgit</artifactId>
 			<version>4.6.0.201612231935-r</version>
 		</dependency>
+		<dependency>
+			<groupId>com.github.gumtreediff</groupId>
+			<artifactId>core</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.gumtreediff</groupId>
+			<artifactId>gen.jdt</artifactId>
+			<version>3.0.0</version>
+		</dependency>
 
-		<!-- テスト依存は test スコープに（本体へ混入させない） -->
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

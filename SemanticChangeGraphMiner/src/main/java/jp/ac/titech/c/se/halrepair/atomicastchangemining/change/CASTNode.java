@@ -32,71 +32,34 @@ public class CASTNode implements Serializable {
         return label;
     }
 
-    public CASTNode(CASTNode parent, ASTNode node, int id){
-        this.parent = parent;
-        this.id = id;
-        this.pos = node.getStartPosition();
-        this.length = node.getLength();
-        this.type = node.getNodeType();
+    private String normalizedLabel = "";
+    public void setNormalizedLabel(String normalizedLabel) {
+    	this.normalizedLabel = normalizedLabel;
+    }
 
-        switch(node.getNodeType()){
-            case ASTNode.BOOLEAN_LITERAL:
-                BooleanLiteral booleanLiteral = (BooleanLiteral)node;
-                this.label = String.valueOf(booleanLiteral.booleanValue());
-                break;
-            case ASTNode.CHARACTER_LITERAL:
-                CharacterLiteral characterLiteral = (CharacterLiteral)node;
-                this.label = String.valueOf(characterLiteral.charValue());
-                break;
-            case ASTNode.STRING_LITERAL:
-                StringLiteral stringLiteral = (StringLiteral)node;
-                this.label = stringLiteral.getLiteralValue();
-                break;
-            case ASTNode.NUMBER_LITERAL:
-                NumberLiteral numberLiteral = (NumberLiteral)node;
-                this.label = numberLiteral.getToken();
-                break;
-            case ASTNode.SIMPLE_NAME:
-                SimpleName simpleName = (SimpleName)node;
-                this.label = simpleName.getIdentifier();
-                break;
-            case ASTNode.PREFIX_EXPRESSION:
-                PrefixExpression prefixExpression = (PrefixExpression)node;
-                this.label = prefixExpression.getOperator().toString();
-                break;
-            case ASTNode.POSTFIX_EXPRESSION:
-                PostfixExpression postfixExpression = (PostfixExpression)node;
-                this.label = postfixExpression.getOperator().toString();
-                break;
-            default:
-                this.label = "";
-                break;
-        }
-
-        @SuppressWarnings("unchecked")
-        List<StructuralPropertyDescriptor> props = node.structuralPropertiesForType();
-        for(StructuralPropertyDescriptor prop : props){
-            Object value = node.getStructuralProperty(prop);
-            if (prop instanceof ChildPropertyDescriptor) {
-                // 単一の子ノード
-                if (value instanceof ASTNode) {
-                    ASTNode child = (ASTNode) value;
-                    int childId = this.id;
-                    this.children.add(new CASTNode(this, child, childId));
-                }
-            } else if (prop instanceof ChildListPropertyDescriptor) {
-                // 複数子ノードのリスト
-                @SuppressWarnings("unchecked")
-                List<ASTNode> list = (List<ASTNode>) value;
-                for (ASTNode child : list) {
-                    int childId = this.id;
-                    this.children.add(new CASTNode(this, child, childId));
-                }
-            }
-        }
+    public String getNormalizedLabel() {
+    	return normalizedLabel;
     }
 
     public String toString(){
         return "CASTNode{id=" + id + ", type=" + type + ", label=" + label + ", pos=" + pos + ", length=" + length + "}";
+    }
+
+    public String printTree(){
+        return printTree(0, false);
+    }
+
+    public String printNormalizedTree(){
+        return printTree(0, true);
+    }
+
+    public String printTree(int depth, boolean isNormalized){
+        StringBuilder sb = new StringBuilder();
+        String label = isNormalized ? getNormalizedLabel() : getLabel();
+        sb.append(String.format("%s%d %s \"%s\" [%d, %d]\n", "  ".repeat(depth), id, ASTNode.nodeClassForType(type).getSimpleName(), label, pos, length));
+        for(CASTNode child : children){
+            sb.append(child.printTree(depth + 1, isNormalized));
+        }
+        return sb.toString();
     }
 }

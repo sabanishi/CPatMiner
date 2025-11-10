@@ -1,5 +1,6 @@
 package jp.ac.titech.c.se.halrepair.sematicchangegraphminer;
 
+import jp.ac.titech.c.se.halrepair.atomicastchangemining.change.CASTNode;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.change.ChangeGraph;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.graphics.DotGraph;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.groum.GROUMGraph;
@@ -19,10 +20,11 @@ public class GraphSandbox {
         ArrayList<GROUMGraph> graphs = readGraphs("e2bf7bfc3977ff7f8a7699d3e17039c78366b465.dat");
 
         for(GROUMGraph g : graphs){
-            System.out.println(g.getName());
-            for(GROUMNode node : g.getNodes()){
-                System.out.println(node.getLabel());
-            }
+            //System.out.println(g.getName());
+            CASTNode before = g.getChangeGraph().getBeforeAST();
+
+            System.out.println("original tree:\n"+before.printTree());
+            System.out.println("normalized tree:\n"+before.printNormalizedTree());
         }
     }
 
@@ -38,10 +40,10 @@ public class GraphSandbox {
         HashMap<String, HashMap<String, ChangeGraph>> fileChangeGraphs = (HashMap<String, HashMap<String, ChangeGraph>>) FileIO.readObjectFromFile(sub.getAbsolutePath());
 
         for (String fp : fileChangeGraphs.keySet()) {
-            //System.out.println(fp);
+            System.out.println(fp);
             HashMap<String, ChangeGraph> cgs = fileChangeGraphs.get(fp);
             for (String method : cgs.keySet()) {
-                //System.out.println(method);
+                System.out.println("method: \n"+method);
                 int index = sub.getName().indexOf('.');
                 if (index < 0) {
                     index = sub.getName().length();
@@ -49,7 +51,6 @@ public class GraphSandbox {
                 String name = FileIO.getSimpleFileName(sub.getName().substring(0, index)) + "," + fp + "," + method;
                 ChangeGraph cg = cgs.get(method);
                 if (cg.getNodes().size() <= 2) continue;
-                System.out.println(cg.getBeforeAST().toString());
                 GROUMGraph g = new GROUMGraph(cg, name);
                 // FIXME
                 g.pruneDoubleEdges();

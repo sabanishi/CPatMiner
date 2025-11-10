@@ -1,7 +1,6 @@
 public class A{
-    Dao dao;
     public static int hoga(){
-        dao = new Dao();
+        Dao dao = new Dao();
 
         int x = dao.fuga();
     }
