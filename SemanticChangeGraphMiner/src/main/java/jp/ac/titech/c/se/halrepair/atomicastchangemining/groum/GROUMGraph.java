@@ -3,6 +3,7 @@ package jp.ac.titech.c.se.halrepair.atomicastchangemining.groum;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.change.CASTNode;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.change.ChangeEdge;
@@ -38,8 +39,11 @@ public class GROUMGraph {
 				root = pdg.getAfterAST();
 			}
 
-			CASTNode cAstNode = root.getChild(node.getAtsId());
-			GROUMNode cn = new GROUMNode(node, cAstNode);
+			List<CASTNode> cAstNodeList = new ArrayList<>();
+			for(int id : node.getAtsIdList()){
+				cAstNodeList.add(root.getChild(id));
+			}
+			GROUMNode cn = new GROUMNode(node, cAstNodeList);
 			cn.setGraph(this);
 			map.put(node, cn);
 			nodes.add(cn);
@@ -236,6 +240,22 @@ public class GROUMGraph {
 						e.delete();
 				}
 			}
+		}
+	}
+
+	public String getRawText(boolean isBefore){
+		if(isBefore){
+			return changeGraph.getBeforeRawText();
+		}else{
+			return changeGraph.getAfterRawText();
+		}
+	}
+
+	public String getNormalizedText(boolean isBefore){
+		if(isBefore){
+			return changeGraph.getBeforeAST().makeNormalizeText(changeGraph.getBeforeRawText());
+		}else{
+			return changeGraph.getAfterAST().makeNormalizeText(changeGraph.getAfterRawText());
 		}
 	}
 }

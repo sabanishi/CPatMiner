@@ -23,8 +23,6 @@ public class GraphSandbox {
         System.out.println("Before length: " + beforeNode.getLength());
         System.out.println("After length: " + afterNode.getLength());
 
-        TreedMapper mapper = new TreedMapper(beforeNode, afterNode);
-        mapper.map(true);
-        mapper.printChanges();
+
     }
 }

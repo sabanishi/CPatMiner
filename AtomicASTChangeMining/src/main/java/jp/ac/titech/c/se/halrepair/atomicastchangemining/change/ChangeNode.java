@@ -3,6 +3,7 @@ package jp.ac.titech.c.se.halrepair.atomicastchangemining.change;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.pdg.graph.PDGActionNode;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.pdg.graph.PDGControlNode;
@@ -15,10 +16,10 @@ public class ChangeNode implements Serializable {
     private static final long serialVersionUID = 1416981239324616711L;
 
     // CASTNodeのIDに対応している
-    private int atsId = -1;
+    private List<Integer> atsIdList = new ArrayList<>();
     // ASTとの対応位置用変数
-    private int startPos;
-    private int length;
+    private List<Integer> startPos;
+    private List<Integer> length;
 
     private final int astNodeType;
     private int changeType = -1;
@@ -31,18 +32,18 @@ public class ChangeNode implements Serializable {
     private final ArrayList<ChangeEdge> inEdges = new ArrayList<>(), outEdges = new ArrayList<>();
 
     public void setAstId(int atsId) {
-    	this.atsId = atsId;
+    	this.atsIdList.add(atsId);
     }
 
-    public int getAtsId() {
-    	return atsId;
+    public List<Integer> getAtsIdList() {
+    	return atsIdList;
     }
 
-    public int getStartPos() {
+    public List<Integer> getStartPos() {
         return startPos;
     }
 
-    public int getLength() {
+    public List<Integer> getLength() {
         return length;
     }
 
@@ -50,6 +51,17 @@ public class ChangeNode implements Serializable {
         this.astNodeType = node.getAstNodeType();
         this.version = node.version;
         if (node.getAstNode() != null) {
+            startPos = new ArrayList<Integer>();
+            length = new ArrayList<Integer>();
+            startPos.add(node.getAstNode().getStartPosition());
+            length.add(node.getAstNode().getLength());
+            if(!node.getAdditionalAstNodeList().isEmpty()){
+                for(ASTNode additionalNode : node.getAdditionalAstNodeList()){
+                    startPos.add(additionalNode.getStartPosition());
+                    length.add(additionalNode.getLength());
+                }
+            }
+
             setPositionInfo(node.getAstNode());
             if (node.getAstNode().getProperty(TreedConstants.PROPERTY_STATUS) != null) {
                 this.changeType = (int) node.getAstNode().getProperty(TreedConstants.PROPERTY_STATUS);
@@ -422,9 +434,6 @@ public class ChangeNode implements Serializable {
     }
 
     private void setPositionInfo(ASTNode astNode) {
-        startPos = astNode.getStartPosition();
-        length = astNode.getLength();
-
         if (astNode instanceof ArrayAccess) setPositionInfo((ArrayAccess) astNode);
         else if (astNode instanceof ArrayCreation) setPositionInfo((ArrayCreation) astNode);
         else if (astNode instanceof ArrayInitializer) setPositionInfo((ArrayInitializer) astNode);

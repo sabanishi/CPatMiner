@@ -1464,8 +1464,12 @@ public class PDGGraph implements Serializable {
 				for (PDGDataNode def : defs)
 					if (def != null)
 						new PDGDataEdge(def, source, PDGDataEdge.Type.REFERENCE);
-				if (!defs.contains(null))
+				if (!defs.contains(null)){
 					pdg.dataSources.remove(source);
+					for(PDGDataNode no : defs){
+						no.addAdditionalAsrNode(source.astNode);
+					}
+				}
 			}
 		}
 		updateDefStore(pdg.defStore);
@@ -1882,6 +1886,7 @@ public class PDGGraph implements Serializable {
 							delete(dr);
 							delete(dn);
 							delete(a);
+							s.addAdditionalAsrNode(dr.getAstNode());
 						}
 					}
 				}

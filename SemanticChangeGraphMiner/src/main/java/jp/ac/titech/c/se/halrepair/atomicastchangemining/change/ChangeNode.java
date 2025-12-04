@@ -2,6 +2,7 @@ package jp.ac.titech.c.se.halrepair.atomicastchangemining.change;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ChangeNode implements Serializable {
 	private static final long serialVersionUID = 1416981239324616711L;
@@ -14,10 +15,10 @@ public class ChangeNode implements Serializable {
 	public static final int STATUS_MOVED = 6;
 
 	// CASTNodeのIDに対応している
-	private int atsId = -1;
+	private List<Integer> atsIdList = new ArrayList<>();
 	// ASTとの対応位置用変数
-	private int startPos;
-	private int length;
+	private List<Integer> startPos;
+	private List<Integer> length;
 	
 	private int astNodeType;
 	private int changeType = -1;
@@ -72,15 +73,15 @@ public class ChangeNode implements Serializable {
 	public String getLabel() {
 		return label;
 	}
-	public int getAtsId() {
-		return atsId;
+	public List<Integer> getAtsIdList() {
+		return atsIdList;
 	}
 
-	public int getStartPos() {
+	public List<Integer> getStartPos() {
 		return startPos;
 	}
 
-	public int getLength() {
+	public List<Integer> getLength() {
 		return length;
 	}
 

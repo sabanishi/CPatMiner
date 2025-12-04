@@ -16,7 +16,7 @@ public class CASTNode implements Serializable {
     private CASTNode parent = null;
     private int type = -1;
     private String label = "";
-    private ASTNode originalNode = null;
+    private transient ASTNode originalNode = null;
 
     public void setId(int id){
         this.id = id;

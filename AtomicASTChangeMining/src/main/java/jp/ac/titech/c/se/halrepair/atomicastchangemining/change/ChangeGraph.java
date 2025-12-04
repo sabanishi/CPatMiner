@@ -15,10 +15,12 @@ public class ChangeGraph implements Serializable {
 
     private final HashSet<ChangeNode> nodes = new HashSet<>();
 
+    private String beforeRawText = "";
+    private String afterRawText = "";
     private CASTNode beforeAST = null;
     private CASTNode afterAST = null;
 
-    public ChangeGraph(PDGGraph pdg, CASTNode beforeAST, CASTNode afterAST) {
+    public ChangeGraph(PDGGraph pdg, CASTNode beforeAST, CASTNode afterAST, String beforeRawText, String afterRawText) {
         HashSet<PDGNode> changedNodes = pdg.getChangedNodes();
         if (changedNodes.isEmpty()) return;
         HashMap<PDGNode, ChangeNode> map = new HashMap<>();
@@ -39,6 +41,8 @@ public class ChangeGraph implements Serializable {
 
         this.beforeAST = beforeAST;
         this.afterAST = afterAST;
+        this.beforeRawText = beforeRawText;
+        this.afterRawText = afterRawText;
 
         // PDGノードとASTノードの対応付けを行う
         for(ChangeNode pdgNode : nodes){
@@ -48,10 +52,14 @@ public class ChangeGraph implements Serializable {
             }else if(pdgNode.getVersion() == 1){
                 root = this.afterAST;
             }
-            CASTNode cAstNode = searchCASTNode(root, pdgNode.getStartPos(), pdgNode.getLength());
+            //CASTNode cAstNode = searchCASTNode(root, pdgNode.getStartPos(), pdgNode.getLength());
 
-            assert cAstNode != null : "No corresponding CASTNode found for PDGNode: " + pdgNode;
-            pdgNode.setAstId(cAstNode.getId());
+            for(CASTNode cAstNode : root.preOrder()){
+                if(pdgNode.getStartPos().contains(cAstNode.getStartPosition())
+                && pdgNode.getLength().contains(cAstNode.getLength())){
+                    pdgNode.setAstId(cAstNode.getId());
+                }
+            }
         }
     }
 

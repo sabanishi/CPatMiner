@@ -2,9 +2,8 @@ package jp.ac.titech.c.se.halrepair.atomicastchangemining.change;
 
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.graphics.DotGraph;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.repository.GitConnector;
-import jp.ac.titech.c.se.halrepair.atomicastchangemining.utils.JavaASTUtil;
+import jp.ac.titech.c.se.halrepair.atomicastchangemining.utils.FileIO;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.utils.TestUtil;
-import org.eclipse.jdt.core.dom.*;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.*;
@@ -18,8 +17,10 @@ import java.nio.file.Files;
 import java.util.*;
 
 public class CreateGraphTest {
-    @Test
+    private static String OutputPath = "/Users/sakugawa99/WebGL/CPatMiner/Sandbox/";
+    private static String OutputFileName = "sandbox";
 
+    @Test
     public void test() throws Exception{
         String beforeSource = TestUtil.read("Before.java");
         String afterSource = TestUtil.read("After.java");
@@ -28,9 +29,6 @@ public class CreateGraphTest {
     }
 
     private void create(String beforeSource, String afterSource) throws Exception{
-        HashSet<CClass> beforeClasses = new CFile(null, "Before.java", beforeSource).getClasses();
-        HashSet<CClass> afterClasses = new CFile(null, "After.java", afterSource).getClasses();
-
         Repository repo = new InMemoryRepository(new DfsRepositoryDescription("dummy-repo"));
         RevCommit commit = createCommitFromDiff(repo, beforeSource, afterSource);
 
@@ -39,52 +37,23 @@ public class CreateGraphTest {
         RevisionAnalyzer ra = new RevisionAnalyzer(ca, commit);
         ra.analyzeGit();
 
-        HashMap<String, HashMap<String, ChangeGraph>> changeGraphs = new HashMap<>();
+        int i = 0;
         for (CMethod e : ra.getMappedMethodsM()) {
             ChangeGraph cg = e.getChangeGraph(repo, commit);
 
             // AST出力
-            //System.out.println( cg.getBeforeAST().printTree());
-            //System.out.println(cg.getAfterAST().printTree());
-
-            for(ChangeNode node: cg.getNodes()){
-                System.out.println("node: "+node.getAtsId());
-            }
+            System.out.println( cg.getBeforeAST().printTree());
+            System.out.println(cg.getAfterAST().printTree());
 
             DotGraph dg = new DotGraph(cg);
-            if (!Files.exists((new File( "/Users/sakugawa99/WebGL/" + e.getFullName() + ".dot")).toPath())) {
-                Files.createFile((new File( "/Users/sakugawa99/WebGL/" + e.getFullName() + ".dot")).toPath());
+            String objectName = OutputPath + OutputFileName + "_" + i;
+            if (!Files.exists((new File( objectName + ".dot")).toPath())) {
+                Files.createFile((new File( objectName + ".dot")).toPath());
             }
-            dg.toDotFile(new File( "/Users/sakugawa99/WebGL/" + e.getFullName() + ".dot"));
-            dg.toGraphics("/Users/sakugawa99/WebGL/" + e.getFullName(),"png");
+            dg.toDotFile(new File( objectName + ".dot"));
+            dg.toGraphics(objectName,"png");
+            FileIO.writeObjectToFile(cg, objectName + ".dat", false);
         }
-
-        /*
-        if(beforeClasses.size() != afterClasses.size()){
-            System.out.println("Class number mismatch");
-            return;
-        }
-
-        HashSet<CMethod> beforeMethods = new HashSet<>();
-        for(CClass bc : beforeClasses){
-            beforeMethods.addAll(createMethods(bc));
-        }
-
-        HashSet<CMethod> afterMethods = new HashSet<>();
-        for(CClass ac : afterClasses){
-            afterMethods.addAll(createMethods(ac));
-        }
-
-        CMethod bm = beforeMethods.iterator().next();
-        CMethod am = afterMethods.iterator().next();
-
-        CMethod.setMap(bm, am);
-
-        ChangeGraph cg = bm.getChangeGraph(null,null);
-
-        for(ChangeNode cn : cg.getNodes()){
-            System.out.println("Node: " + cn.getAstNodeType() + " ChangeType: " + cn.getChangeType());
-        }*/
     }
 
     private RevCommit createCommitFromDiff(Repository repo, String before, String after) throws Exception{
@@ -124,13 +93,5 @@ public class CreateGraphTest {
         rw.close();
         repo.close();
         return commitAfter;
-    }
-
-    private List<CMethod> createMethods(CClass cClass){
-        List<CMethod> methods = new ArrayList<>();
-        for(CMethod cm : cClass.getMethods()){
-            methods.add(cm);
-        }
-        return methods;
     }
 }

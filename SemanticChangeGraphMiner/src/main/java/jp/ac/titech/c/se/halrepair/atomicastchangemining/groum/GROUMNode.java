@@ -1,9 +1,6 @@
 package jp.ac.titech.c.se.halrepair.atomicastchangemining.groum;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.change.CASTNode;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.change.ChangeNode;
@@ -92,12 +89,16 @@ public class GROUMNode {
 	private HashSet<GROUMEdge> inEdges = new HashSet<GROUMEdge>();
 	private HashSet<GROUMEdge> outEdges = new HashSet<GROUMEdge>();
 
-	private CASTNode cAstNode;
+	private List<CASTNode> cAstNodeList;
 	private boolean isNormalized = false;
 
-	public GROUMNode(ChangeNode node, CASTNode cAstNode) {
-		this.cAstNode = cAstNode;
-		this.cAstNode.setNormalizedLabel(this.cAstNode.getLabel());
+	public List<CASTNode> getCAstNodeList(){
+		return cAstNodeList;
+	}
+
+	public GROUMNode(ChangeNode node, List<CASTNode> cAstNode) {
+		this.cAstNodeList = cAstNode;
+		//this.cAstNode.setNormalizedLabel(this.cAstNode.getLabel());
 		this.changeType = node.getChangeType();
 		this.version = node.getVersion();
 		this.astType = (char) node.getAstNodeType();
@@ -116,7 +117,6 @@ public class GROUMNode {
 				if (isInvocation(this.astType)) {
 					// メソッド呼び出しの場合
 					this.label = node.getDataName() + "(" + this.getDataType() + ")";
-					this.cAstNode.setNormalizedLabel(this.label);
 					this.isNormalized = true;
 				} else if (this.astType == ASTNode.INFIX_EXPRESSION) {
 					char cl = (char) (infixExpressionLables.get(node.getLabel()) + 128);
@@ -138,17 +138,25 @@ public class GROUMNode {
 				this.isNormalized = true;
 				if (isLiteral()) {
 					// リテラルの場合
-					this.label = String.valueOf(this.astType);
-					this.cAstNode.setNormalizedLabel(this.label);
+					this.label = ASTNode.nodeClassForType(this.astType).getSimpleName();
+
+					// CASTNodeに正規化したことを伝える
+					for(CASTNode castNode : cAstNodeList){
+						castNode.setNormalizedLabel(label);
+					}
+
 				}else{
 					// 変数の場合
 					this.astType = ASTNode.SIMPLE_NAME;
 					this.label = String.valueOf(this.astType);
-					this.cAstNode.setNormalizedLabel(this.label);
 				}
 				break;
 			default:
 				break;
+		}
+
+		for(CASTNode castNode : cAstNodeList){
+			castNode.setGroumNode(this);
 		}
 	}
 	
@@ -290,10 +298,6 @@ public class GROUMNode {
 			else
 				nonrefs.add(e.getDest());
 		}
-	}
-
-	public CASTNode getCAstNode(){
-		return cAstNode;
 	}
 	
 	public void addInEdge(GROUMEdge edge) {

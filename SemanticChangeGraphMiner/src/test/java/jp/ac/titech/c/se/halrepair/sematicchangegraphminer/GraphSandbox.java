@@ -15,50 +15,44 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class GraphSandbox {
+    private static String OutputPath = "/Users/sakugawa99/WebGL/CPatMiner/Sandbox/";
+    private static String OutputFileName = "sandbox";
+
     @Test
     public void test() throws Exception {
-        ArrayList<GROUMGraph> graphs = readGraphs("e2bf7bfc3977ff7f8a7699d3e17039c78366b465.dat");
+        GROUMGraph g = readGraphs(0);
 
-        for(GROUMGraph g : graphs){
-            //System.out.println(g.getName());
-            CASTNode before = g.getChangeGraph().getBeforeAST();
+        //System.out.println(g.getName());
+        CASTNode before = g.getChangeGraph().getBeforeAST();
+        CASTNode after = g.getChangeGraph().getAfterAST();
 
-            System.out.println("original tree:\n"+before.printTree());
-            System.out.println("normalized tree:\n"+before.printNormalizedTree());
+        System.out.println(g.getRawText(false));
+        System.out.println("=====================================");
+        System.out.println(after.printTree());
+        System.out.println("=====================================");
+        System.out.println(g.getNormalizedText(false));
+
+        //System.out.println("original tree:\n"+before.printTree());
+        //System.out.println("normalized tree:\n"+after.printTree());
+
+        for(GROUMNode node : g.getNodes()){
+            if(node.getVersion()==1){
+                System.out.println(node.getLabel());
+                for(CASTNode castNode : node.getCAstNodeList()){
+                    System.out.println(castNode.toString());
+                }
+            }
         }
     }
 
 
-    private static ArrayList<GROUMGraph> readGraphs(String changesPath) {
-        ArrayList<GROUMGraph> graphs = new ArrayList<>();
-
-        ClassLoader classLoader = TestUtil.class.getClassLoader();
-        URL resource = classLoader.getResource(changesPath);
-        File sub = new File(resource.getPath());
-
-        @SuppressWarnings("unchecked")
-        HashMap<String, HashMap<String, ChangeGraph>> fileChangeGraphs = (HashMap<String, HashMap<String, ChangeGraph>>) FileIO.readObjectFromFile(sub.getAbsolutePath());
-
-        for (String fp : fileChangeGraphs.keySet()) {
-            System.out.println(fp);
-            HashMap<String, ChangeGraph> cgs = fileChangeGraphs.get(fp);
-            for (String method : cgs.keySet()) {
-                System.out.println("method: \n"+method);
-                int index = sub.getName().indexOf('.');
-                if (index < 0) {
-                    index = sub.getName().length();
-                }
-                String name = FileIO.getSimpleFileName(sub.getName().substring(0, index)) + "," + fp + "," + method;
-                ChangeGraph cg = cgs.get(method);
-                if (cg.getNodes().size() <= 2) continue;
-                GROUMGraph g = new GROUMGraph(cg, name);
-                // FIXME
-                g.pruneDoubleEdges();
-                g.setProject("dummy");
-                graphs.add(g);
-            }
-        }
-
-        return graphs;
+    private static GROUMGraph readGraphs(int number) {
+        String objectName = OutputPath + OutputFileName + "_" + number;
+        ChangeGraph cg = (ChangeGraph)FileIO.readObjectFromFile(objectName + ".dat");
+        String name = OutputFileName + "_" + number;
+        GROUMGraph g = new GROUMGraph(cg, name);
+        g.pruneDoubleEdges();
+        g.setProject("dummy");
+        return g;
     }
 }

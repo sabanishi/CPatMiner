@@ -475,8 +475,8 @@ public class CMethod extends ChangeEntity {
         pdg2.buildChangeGraph(1);
         pdg2.buildChangeGraph(pdg1);
 
-        CASTNode beforeAST = new CRootASTNode(this.rawText, this.declaration);
-        CASTNode afterAST = new CRootASTNode(this.mappedMethod.rawText, this.mappedMethod.declaration);
+        CASTNode beforeAST = new CASTNode(null, this.declaration);
+        CASTNode afterAST = new CASTNode(null, this.mappedMethod.declaration);
 
         // 2つのノードのマッピングを行う
         TreedMapper mapper = new TreedMapper(this.declaration, this.mappedMethod.declaration);
@@ -502,6 +502,6 @@ public class CMethod extends ChangeEntity {
             }
         }
 
-        return new ChangeGraph(pdg2, beforeAST, afterAST);
+        return new ChangeGraph(pdg2, beforeAST, afterAST, this.rawText, this.mappedMethod.rawText);
     }
 }

@@ -216,11 +216,11 @@ public class ChangeAnalyzer {
             for (CMethod e : ra.getMappedMethodsM()) {
                 ChangeGraph cg = e.getChangeGraph(this.gitConn.getRepository(), commit);
                 int[] csizes = cg.getChangeSizes();
+                System.out.println("found:" + commit.getName());
                 if (csizes[0] > 0 && csizes[1] > 0
                         && (csizes[0] + csizes[1]) >= 3
                         && csizes[0] <= 100 && csizes[1] <= 100
                         && cg.hasMethods()) {
-                    System.out.println("found:" + commit.getName());
 
                     // DEBUG
                     DotGraph dg = new DotGraph(cg);

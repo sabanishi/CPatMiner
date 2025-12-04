@@ -80,10 +80,13 @@ public class Miner {
 			//groum.deleteUnaryOperationNodes();
 			groum.collapseLiterals();
 		}
+
+		// 大きさ=1のノードの組を収集する
 		HashMap<String, HashSet<GROUMNode[]>> nodesOfLabel = new HashMap<>();
 		for (GROUMGraph groum : groums) {
 			for (GROUMNode node : groum.getNodes()) {
 				if (node.getVersion() != 0) continue;
+				// 変更前のノードのみを対象とする
 				GROUMNode mappedNode = node.getMappedNode();
 				if (mappedNode == null) continue;
 				String label = node.getLabel() + PAIR_SEPARATOR + mappedNode.getLabel();
@@ -98,12 +101,15 @@ public class Miner {
 		Lattice l = new Lattice();
 		l.setStep(2);
 		lattices.add(l);
+		// 大きさ=1のノードのうち、頻度が一定以下、または変更前のノードのlabelの長さが1のものを削除する
 		for (String label : new HashSet<String>(nodesOfLabel.keySet())) {
 			HashSet<GROUMNode[]> nodes = nodesOfLabel.get(label);
+			// label.split(PAIR_SEPARATOR)[0] = 変更前のノードのラベル
 			if (nodes.size() < Pattern.minFreq || !GROUMNode.isCoreAction(label.split(PAIR_SEPARATOR)[0]))
 				nodesOfLabel.remove(label);
 		}
 		System.out.println("Got all first pairs");
+
 		for (String label : nodesOfLabel.keySet()) {
 			HashSet<GROUMNode[]> pairs = nodesOfLabel.get(label);
 			HashSet<Fragment> fragments = new HashSet<>();
@@ -111,6 +117,7 @@ public class Miner {
 				Fragment f = new Fragment(pair);
 				fragments.add(f);
 			}
+			// PDGの大きさが1のパターンを生成し、拡張する
 			Pattern p = new Pattern(fragments, fragments.size());
 			extend(p);
 		}

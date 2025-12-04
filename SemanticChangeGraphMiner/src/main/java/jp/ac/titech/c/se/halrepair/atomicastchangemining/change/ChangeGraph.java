@@ -9,6 +9,8 @@ public class ChangeGraph implements Serializable {
 	private HashSet<ChangeNode> nodes = new HashSet<>();
 	private CASTNode beforeAST = null;
 	private CASTNode afterAST = null;
+	private String beforeRawText = "";
+	private String afterRawText = "";
 
 	public HashSet<ChangeNode> getNodes() {
 		return nodes;
@@ -19,5 +21,12 @@ public class ChangeGraph implements Serializable {
 
 	public CASTNode getAfterAST() {
 		return afterAST;
+	}
+	public String getBeforeRawText(){
+		return beforeRawText;
+	}
+
+	public String getAfterRawText(){
+		return afterRawText;
 	}
 }

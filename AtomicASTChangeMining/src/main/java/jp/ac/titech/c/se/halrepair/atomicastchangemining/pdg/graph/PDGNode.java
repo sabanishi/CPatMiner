@@ -2,6 +2,7 @@ package jp.ac.titech.c.se.halrepair.atomicastchangemining.pdg.graph;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 
@@ -19,6 +20,16 @@ public abstract class PDGNode {
 	protected ArrayList<PDGEdge> outEdges = new ArrayList<PDGEdge>();
 
 	public int version;
+
+	private List<ASTNode> additionalAstNodeList = new ArrayList<>();
+
+	public void addAdditionalAsrNode(ASTNode node){
+		additionalAstNodeList.add(node);
+	}
+
+	public List<ASTNode> getAdditionalAstNodeList(){
+		return this.additionalAstNodeList;
+	}
 	
 	public PDGNode(ASTNode astNode, int nodeType) {
 		this.astNode = astNode;
