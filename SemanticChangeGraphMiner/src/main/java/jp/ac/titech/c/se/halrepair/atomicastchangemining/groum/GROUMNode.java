@@ -168,10 +168,17 @@ public class GROUMNode {
 		this.version = node.version;
 		this.dataName = node.dataName;
 		this.dataType = node.dataType;
-		if (node.starts != null)
+		this.cAstNodeList = new ArrayList<>();
+		for(CASTNode castNode : node.cAstNodeList){
+			this.cAstNodeList.add(castNode);
+			castNode.setGroumNode(this);
+		}
+		if (node.starts != null){
 			this.starts = Arrays.copyOf(node.starts, node.starts.length);
-		if (node.lengths != null)
+		}
+		if (node.lengths != null){
 			this.lengths = Arrays.copyOf(node.lengths, node.lengths.length);
+		}
 	}
 
 	public GROUMNode(String id, int version, HashMap<String, String> attributes) {
@@ -420,7 +427,7 @@ public class GROUMNode {
 	}
 	
 	public static boolean isCoreAction(String label) {
-		return label.length() > 1;
+		return true;
 	}
 
 	public static boolean isInvocation(char astNodeType) {

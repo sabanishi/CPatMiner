@@ -6,7 +6,9 @@ import jp.ac.titech.c.se.halrepair.atomicastchangemining.graphics.DotGraph;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.groum.GROUMGraph;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.groum.GROUMNode;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.utils.FileIO;
+import jp.ac.titech.c.se.halrepair.sematicchangegraphminer.utils.ReadGraph;
 import jp.ac.titech.c.se.halrepair.sematicchangegraphminer.utils.TestUtil;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.junit.Test;
 
 import java.io.File;
@@ -15,28 +17,34 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class GraphSandbox {
-    private static String OutputPath = "/Users/sakugawa99/WebGL/CPatMiner/Sandbox/";
-    private static String OutputFileName = "sandbox";
 
     @Test
     public void test() throws Exception {
-        GROUMGraph g = readGraphs(0);
+        GROUMGraph g = ReadGraph.read(0);
 
-        //System.out.println(g.getName());
         CASTNode before = g.getChangeGraph().getBeforeAST();
         CASTNode after = g.getChangeGraph().getAfterAST();
 
+
+        System.out.println("=====================================");
+        System.out.println("[before]");
+        System.out.println(g.getRawText(true));
+        System.out.println("=====================================");
+        /*ystem.out.println("[before(normalize)]");
+        System.out.println(g.getNormalizedText(true));
+        System.out.println("=====================================");*/
+        System.out.println("[after]");
         System.out.println(g.getRawText(false));
         System.out.println("=====================================");
-        System.out.println(after.printTree());
-        System.out.println("=====================================");
+        /*System.out.println("[after(normalize)]");
         System.out.println(g.getNormalizedText(false));
+        System.out.println("=====================================");*/
 
-        //System.out.println("original tree:\n"+before.printTree());
-        //System.out.println("normalized tree:\n"+after.printTree());
+        System.out.println(printMarkTree(before));
+        System.out.println("=====================================");
 
         for(GROUMNode node : g.getNodes()){
-            if(node.getVersion()==1){
+            if(node.getVersion()==0){
                 System.out.println(node.getLabel());
                 for(CASTNode castNode : node.getCAstNodeList()){
                     System.out.println(castNode.toString());
@@ -45,14 +53,25 @@ public class GraphSandbox {
         }
     }
 
+    private static String printMarkTree(CASTNode node){
+        return printMarkTreeInternal(node, 0);
+    }
 
-    private static GROUMGraph readGraphs(int number) {
-        String objectName = OutputPath + OutputFileName + "_" + number;
-        ChangeGraph cg = (ChangeGraph)FileIO.readObjectFromFile(objectName + ".dat");
-        String name = OutputFileName + "_" + number;
-        GROUMGraph g = new GROUMGraph(cg, name);
-        g.pruneDoubleEdges();
-        g.setProject("dummy");
-        return g;
+    private static String printMarkTreeInternal(CASTNode node, int depth){
+        StringBuilder sb = new StringBuilder();
+
+        String mark = node.getGroumNode() != null ? "*" : " ";
+        sb.append(mark);
+
+        sb.append(String.format("%s%d %s \"%s\" [%d, %d]\n", "  ".repeat(depth),
+                node.getId(),
+                ASTNode.nodeClassForType(node.getType()).getSimpleName(),
+                node.getLabel(),
+                node.getStartPosition(),
+                node.getLength()));
+        for(CASTNode child : node.getChildren()){
+            sb.append(printMarkTreeInternal(child, depth + 1));
+        }
+        return sb.toString();
     }
 }

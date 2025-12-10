@@ -719,9 +719,12 @@ public class PDGGraph implements Serializable {
 
 	private PDGGraph buildPDG(PDGNode control, String branch,
 			MethodInvocation astNode) {
-		if (astNode.getName().getIdentifier().toLowerCase().contains("assert"))
+		// Assert文は同じ形として扱う
+		// これは消す
+		/*if (astNode.getName().getIdentifier().toLowerCase().contains("assert"))
 			return new PDGGraph(context, new PDGActionNode(control, branch,
 					astNode, astNode.getNodeType(), null, null, "assert"));
+		 */
 		if (astNode.getName().getIdentifier().equals("exit")
 				&& astNode.getExpression() != null && astNode.getExpression().toString().equals("System")) {
 			PDGActionNode node = new PDGActionNode(control, branch,

@@ -4,6 +4,7 @@ import jp.ac.titech.c.se.halrepair.atomicastchangemining.graphics.DotGraph;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.repository.GitConnector;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.utils.FileIO;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.utils.TestUtil;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.*;
@@ -42,8 +43,12 @@ public class CreateGraphTest {
             ChangeGraph cg = e.getChangeGraph(repo, commit);
 
             // AST出力
-            System.out.println( cg.getBeforeAST().printTree());
+            //System.out.println( cg.getBeforeAST().printTree());
             System.out.println(cg.getAfterAST().printTree());
+
+            for(ChangeNode node : cg.getNodes()){
+                System.out.println(node.getLabel() + " : " + ASTNode.nodeClassForType(node.getAstNodeType()));
+            }
 
             DotGraph dg = new DotGraph(cg);
             String objectName = OutputPath + OutputFileName + "_" + i;
@@ -51,6 +56,7 @@ public class CreateGraphTest {
                 Files.createFile((new File( objectName + ".dot")).toPath());
             }
             dg.toDotFile(new File( objectName + ".dot"));
+            System.out.println(objectName);
             dg.toGraphics(objectName,"png");
             FileIO.writeObjectToFile(cg, objectName + ".dat", false);
         }

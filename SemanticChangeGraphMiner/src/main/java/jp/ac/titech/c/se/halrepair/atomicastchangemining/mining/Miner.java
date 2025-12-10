@@ -105,12 +105,15 @@ public class Miner {
 		for (String label : new HashSet<String>(nodesOfLabel.keySet())) {
 			HashSet<GROUMNode[]> nodes = nodesOfLabel.get(label);
 			// label.split(PAIR_SEPARATOR)[0] = 変更前のノードのラベル
-			if (nodes.size() < Pattern.minFreq || !GROUMNode.isCoreAction(label.split(PAIR_SEPARATOR)[0]))
+			if (nodes.size() < Pattern.minFreq || !GROUMNode.isCoreAction(label.split(PAIR_SEPARATOR)[0])){
+				System.out.println("Removing label: " + label + label.split(PAIR_SEPARATOR)[0]);
 				nodesOfLabel.remove(label);
+			}
 		}
 		System.out.println("Got all first pairs");
 
 		for (String label : nodesOfLabel.keySet()) {
+			System.out.println("Processing label: " +  label);
 			HashSet<GROUMNode[]> pairs = nodesOfLabel.get(label);
 			HashSet<Fragment> fragments = new HashSet<>();
 			for (GROUMNode[] pair : pairs) {
@@ -119,6 +122,7 @@ public class Miner {
 			}
 			// PDGの大きさが1のパターンを生成し、拡張する
 			Pattern p = new Pattern(fragments, fragments.size());
+			System.out.println("Extending pattern " + p.getId() + " of size " + p.getSize() + " with freq " + p.getFreq());
 			extend(p);
 		}
 		System.out.println("Done mining level " + this.level);
@@ -129,6 +133,7 @@ public class Miner {
 
 
 		// Collect patterns mined from this level preparing for the next (super) pattern mining level
+		// 今の実装だとlevel=1で固定されているのでこの処理は必要ない？
 		ArrayList<GROUMGraph> patterns = new ArrayList<>();
 		collectPatternsForNextStep(patterns);
 		
@@ -319,8 +324,14 @@ public class Miner {
 //			System.out.println(beforeAndAfter.get(1).substring(highlight.get(0),highlight.get(1)+highlight.get(0)));
 //		}
 
-		String afterStr = beforeAndAfter.get(0);
-		String beforeStr = beforeAndAfter.get(1);
+		// テスト用コードではbeforeAndAfterはnullになるので適当な値を代入する
+		String afterStr = "test-after";
+		String beforeStr = "test-before";
+
+		if(beforeAndAfter != null) {
+			afterStr = beforeAndAfter.get(1);
+			beforeStr = beforeAndAfter.get(0);
+		}
 
 		String afterMarkup = markupCode(afterHighlights, afterStr);
 		String beforeMarkup = markupCode(beforeHighlights, beforeStr);
@@ -692,7 +703,12 @@ public class Miner {
 	}
 	
 	private void extend(Pattern pattern) {
+		// HashMapのkey(String型) = 〇〇というラベルのノードを追加して拡張する
+		// HashMapのvalueのkey(Fragment型) = このラベルで拡張できるFragment
+		// HashMapのvalueのvalue(HashSet<ArrayList<GROUMNode>>型) = 追加するノードの組み合わせの集合
 		HashMap<String, HashMap<Fragment, HashSet<ArrayList<GROUMNode>>>> labelFragmentExtendableNodes = new HashMap<>();
+
+		// 各Fragmentから拡張候補ノードを集める
 		for (Fragment f : pattern.getFragments()) {
 			HashMap<String, HashSet<ArrayList<GROUMNode>>> xns = f.extend();
 			for (String label : xns.keySet()) {
@@ -704,15 +720,20 @@ public class Miner {
 				fens.put(f, xns.get(label));
 			}
 		}
+
+		// 頻度が一定以下のラベルを削除する
 		for (String label : new HashSet<String>(labelFragmentExtendableNodes.keySet())) {
 			HashMap<Fragment, HashSet<ArrayList<GROUMNode>>> fens = labelFragmentExtendableNodes.get(label);
 			if (fens.size() < Pattern.minFreq)
 				labelFragmentExtendableNodes.remove(label);
 		}
+
+		// 各ラベル毎に拡張後Fragmentを作り、頻度計算を行う
 		HashSet<Fragment> group = new HashSet<>();
 		int xfreq = Pattern.minFreq - 1;
 		for (String label : labelFragmentExtendableNodes.keySet()) {
 			HashMap<Fragment, HashSet<ArrayList<GROUMNode>>> fens = labelFragmentExtendableNodes.get(label);
+			// 拡張後Fragmentの集合を作成する
 			HashSet<Fragment> xfs = new HashSet<>();
 			for (Fragment f : fens.keySet()) {
 				for (ArrayList<GROUMNode> ens : fens.get(f)) {
@@ -720,47 +741,27 @@ public class Miner {
 					xfs.add(xf);
 				}
 			}
+
 			boolean isGiant = isGiant(xfs, pattern);
-			//System.out.println("\tTrying with label " + label + ": " + xfs.size());
 			HashSet<Fragment> g = new HashSet<>();
 			int freq = mine(g, xfs, pattern, isGiant);
+			// 各ラベルで最も頻度が高い拡張グループを採用する
 			if (freq > xfreq && !Lattice.containsAll(lattices, g)) {
 				group = g;
 				xfreq = freq;
 			}
 		}
-		//System.out.println("Done trying all labels");
+
 		if (xfreq >= Pattern.minFreq) {
+			// 十分に頻度が高い拡張を行えた時、拡張を継続する
 			Pattern xp = new Pattern(group, xfreq);
-			ArrayList<String> labels = new ArrayList<>();
-			Fragment rep = null, xrep = null;
-			for (Fragment f : group) {
-				xrep = f;
-				break;
-			}
-			for (Fragment f : pattern.getFragments()) {
-				rep = f;
-				break;
-			}
-			if (rep == null || xrep == null)
-				throw new NullPointerException();
-			for (int j = rep.getNodes().size(); j < xrep.getNodes().size(); j++)
-				labels.add(xrep.getNodes().get(j).getLabel());
-			/*System.out.println("{Extending pattern of size " + rep.getNodes().size()
-					+ " " + rep.getNodes()
-					+ " occurences: " + pattern.getFragments().size()
-					+ " frequency: " + pattern.getFreq()
-					+ " with label " + labels
-					+ " occurences: " + group.size()
-					+ " frequency: " + xfreq
-					+ " patterns: " + Pattern.nextID 
-					+ " fragments: " + Fragment.numofFragments 
-					+ " next fragment: " + Fragment.nextFragmentId);*/
 			pattern.clear();
 			extend(xp);
 			//System.out.println("}");
-		} else if (pattern.isAChange())
+		} else if (pattern.isAChange()){
+			// どのラベルで拡張してもminFreqを満たす頻度のパターンが得られない時、ここで拡張を終了する
 			pattern.add2Lattice(lattices);
+		}
 	}
 
 	private boolean isGiant(HashSet<Fragment> xfs, Pattern pattern) {

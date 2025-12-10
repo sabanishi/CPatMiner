@@ -1,0 +1,38 @@
+// before
+public static int hoga(){
+    Change c = new Change();
+}
+
+// after
+public static int hoga(){
+    Change c = new Change();
+    c.calc();
+}
+
+beforeのChangeと対応づかないのはなんで？
+
+// AfterのAST
+ 0 MethodDeclaration "hoga(0)" [20, 82]
+   1 Modifier "public" [20, 6]
+   2 Modifier "static" [27, 6]
+   3 PrimitiveType "int" [34, 3]
+   4 SimpleName "hoga" [38, 4]
+   5 Block "{block}" [44, 58]
+     6 VariableDeclarationStatement "Change var" [54, 24]
+       7 SimpleType "Change" [54, 6]
+         8 SimpleName "Change" [54, 6]
+       9 VariableDeclarationFragment "c" [61, 16]
+*        10 SimpleName "c" [61, 1]
+         11 ClassInstanceCreation "new Change" [65, 12]
+           12 SimpleType "Change" [69, 6]
+             13 SimpleName "Change" [69, 6]
+     14 ExpressionStatement "expr;" [87, 9]
+*      15 MethodInvocation "calc" [87, 8]
+*        16 SimpleName "c" [87, 1]
+         17 SimpleName "calc" [89, 4]
+
+
+
+Assert命令は全部同じ命令扱いしている
+PDGGraph.javaの726行目あたり
+buildPDG(PDGNode control, String branch, MethodInvocation astNode)の中

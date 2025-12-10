@@ -2,6 +2,7 @@ package jp.ac.titech.c.se.halrepair.atomicastchangemining.change;
 
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.groum.GROUMNode;
 import org.eclipse.jdt.core.dom.*;
+import org.eclipse.swt.internal.C;
 
 import java.io.Serializable;
 import java.util.*;
@@ -19,7 +20,24 @@ public class CASTNode implements Serializable {
 
     // 以下はAtomicASTChangeMiningには存在しない変数
     private String normalizedLabel = "";
+    // 自身と紐づいているPDGノード
     private GROUMNode groumNode;
+
+    public static CASTNode copyOf(CASTNode node){
+        CASTNode newNode = new CASTNode();
+        newNode.id = node.id;
+        newNode.pos = node.pos;
+        newNode.length = node.length;
+        newNode.type = node.type;
+        newNode.label = node.label;
+        newNode.normalizedLabel = node.normalizedLabel;
+        for(CASTNode child : node.children){
+            CASTNode newChild = copyOf(child);
+            newChild.parent = newNode;
+            newNode.children.add(newChild);
+        }
+        return newNode;
+    }
 
     public void setNormalizedLabel(String label){
         this.normalizedLabel = label;
@@ -27,6 +45,17 @@ public class CASTNode implements Serializable {
 
     public void setGroumNode(GROUMNode node){
         this.groumNode = node;
+    }
+    public int getId(){
+        return id;
+    }
+
+    public int getType(){
+        return type;
+    }
+
+    public GROUMNode getGroumNode(){
+        return groumNode;
     }
 
     public int getStartPosition(){

@@ -17,7 +17,7 @@ public class Pattern {
 	public static final int minSize = 3, maxSize = Integer.MAX_VALUE;
 	
 	public static int mode = -1; // -1 hybrid, 0 within, 1 cross methods, 2 cross commits, 3 cross projects
-	public static int minFreq = 3, maxFreq = 1000;
+	public static int minFreq = 1, maxFreq = 1000;
 	
 	public static int nextID = 1;
 	private int id;
