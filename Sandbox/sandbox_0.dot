@@ -1,19 +1,19 @@
 digraph G {
-1 [label="String(name)" shape=ellipse]
-2 [label="String(name)" shape=ellipse]
-3 [label="String()" shape=ellipse]
-4 [label="String(name)" shape=ellipse]
-5 [label="this.assertEquals()" shape=box]
-6 [label="this.assertThat()" shape=box]
-7 [label="String(name)" shape=ellipse]
-8 [label="this.assertThat().isEmpty()" shape=box]
-2 -> 1 [label="_map_" style=dotted];
-2 -> 4 [label="_ref_" style=dotted];
-4 -> 5 [label="_para_" style=dotted];
-3 -> 5 [label="_para_" style=dotted];
-2 -> 5 [label="_para_" style=dotted];
-7 -> 6 [label="_para_" style=dotted];
-1 -> 6 [label="_para_" style=dotted];
-1 -> 7 [label="_ref_" style=dotted];
-6 -> 8 [label="_recv_" style=dotted];
+1 [label="String(text)" shape=ellipse]
+2 [label="this.assertEquals()" shape=box]
+3 [label="String(text)" shape=ellipse]
+4 [label="String(text)" shape=ellipse]
+5 [label="String(text)" shape=ellipse]
+6 [label="this.assertThat().isEmpty()" shape=box]
+7 [label="String(poyo)" shape=ellipse]
+8 [label="this.assertThat()" shape=box]
+4 -> 1 [label="_ref_" style=dotted];
+1 -> 2 [label="_para_" style=dotted];
+7 -> 2 [label="_para_" style=dotted];
+4 -> 2 [label="_para_" style=dotted];
+5 -> 3 [label="_ref_" style=dotted];
+4 -> 5 [label="_map_" style=dotted];
+8 -> 6 [label="_recv_" style=dotted];
+3 -> 8 [label="_para_" style=dotted];
+5 -> 8 [label="_para_" style=dotted];
 }

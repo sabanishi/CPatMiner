@@ -14,6 +14,6 @@ public class MinerTest {
 
         Miner miner = new Miner(1);
         miner.setCurrDir("hoge");
-        miner.mine(graphs,"/Users/sakugawa99/WebGL/CPatMiner/repos");
+        miner.mine(graphs,"/Users/sakugawa99/WebGL/CPatMiner/repos","/Users/sakugawa99/WebGL/CPatMiner/tmpOutput");
     }
 }

@@ -19,7 +19,6 @@ public class CASTNode implements Serializable {
     private String label = "";
 
     // 以下はAtomicASTChangeMiningには存在しない変数
-    private String normalizedLabel = "";
     // 自身と紐づいているPDGノード
     private GROUMNode groumNode;
 
@@ -30,17 +29,12 @@ public class CASTNode implements Serializable {
         newNode.length = node.length;
         newNode.type = node.type;
         newNode.label = node.label;
-        newNode.normalizedLabel = node.normalizedLabel;
         for(CASTNode child : node.children){
             CASTNode newChild = copyOf(child);
             newChild.parent = newNode;
             newNode.children.add(newChild);
         }
         return newNode;
-    }
-
-    public void setNormalizedLabel(String label){
-        this.normalizedLabel = label;
     }
 
     public void setGroumNode(GROUMNode node){
@@ -149,25 +143,31 @@ public class CASTNode implements Serializable {
         }
     }
 
-    private String makeNormalizeTextInternal(String rawText) {
+    /*
+    public void makeNormalizeFlag(){
+        this.isNormalized = false;
+        this.normalizeType = NormalizeType.None;
+
         if(this.groumNode == null){
-            return rawText;
+            return;
         }
 
         if(this.type == ASTNode.SIMPLE_NAME){
             if(this.parent.type == ASTNode.SINGLE_VARIABLE_DECLARATION
-            || this.parent.type == ASTNode.VARIABLE_DECLARATION_FRAGMENT){
-                return "$V"+ this.id;
+                    || this.parent.type == ASTNode.VARIABLE_DECLARATION_FRAGMENT){
+                this.isNormalized = true;
+                this.normalizeType = NormalizeType.Variable;
             }
             if(this.parent.type == ASTNode.METHOD_INVOCATION
-            && !this.label.equals(this.parent.label)){
-                return "$V"+ this.id;
+                    && !this.label.equals(this.parent.label)){
+                this.isNormalized = true;
+                this.normalizeType = NormalizeType.Variable;
             }
         }
 
         if(this.type == ASTNode.STRING_LITERAL){
             // 「""」の有無を除いて同じなら元の文章を返す
-            /*
+
             if (rawText != null && rawText.length() >= 2 &&
                     rawText.startsWith("\"") && rawText.endsWith("\"")) {
 
@@ -177,12 +177,33 @@ public class CASTNode implements Serializable {
                 if (inner.equals(normalizedLabel)) {
                     return rawText;
                 }
-            }*/
+            }
 
-            return "$L"+ this.id;
+            this.isNormalized = true;
+            this.normalizeType = NormalizeType.Literal;
+        }
+    }
+    */
+
+    private String makeNormalizeTextInternal(String rawText) {
+        if(groumNode == null){
+            return rawText;
+        }
+        if(!groumNode.getIsNormalized() || !groumNode.getIsNormalizeValid()){
+            return rawText;
         }
 
-        return rawText;
+        NormalizeType normalizeType = groumNode.getNormalizeType();
+
+        switch(normalizeType){
+            case Variable:
+                return "$V"+ this.id;
+            case Literal:
+                return "$L"+ this.id;
+            default:
+                System.err.println("Unknown normalize type: " + normalizeType);
+                return rawText;
+        }
     }
 
     public String toString(){

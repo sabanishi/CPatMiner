@@ -4,11 +4,7 @@
 package jp.ac.titech.c.se.halrepair.atomicastchangemining.mining;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.exas.ExasFeature;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.graphics.DotGraph;
@@ -35,15 +31,14 @@ public class Fragment {
 	private HashMap<Integer, Integer> vector = new HashMap<>();
 	private int idSum = 0;
 
-	// 元のAST
-
 	// 元の文章
 	
 	private Fragment() {
 		this.id = nextFragmentId++;
 		numofFragments++;
 	}
-	
+
+	/*
 	public Fragment(GROUMNode node) {
 		this();
 		this.graph = node.getGraph();
@@ -55,6 +50,7 @@ public class Fragment {
 		this.idSum = node.getId();
 		vector.put(1, 1);
 	}
+	 */
 
 	public Fragment(GROUMNode[] pair) {
 		this();
@@ -357,30 +353,22 @@ public class Fragment {
 		return id;
 	}
 	
-	/*@Override
+	@Override
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 		result.append("Fragment " + this.id + ": " + 
 				this.nodes.size() + " nodes\r\n");
-		try {
-			result.append("File: " + GROUMNode.fileNames.get(this.graph.getFileID()) + "\r\n");
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-			System.err.println(this.graph);
-			System.err.println(this.graph.getFileID());
-			System.err.println(GROUMNode.fileNames.get(this.graph.getFileID()));
-		}
+
 		//result.append("Vector: " + this.gramVector + "\r\n");
 		result.append(this.nodes.size() + " Nodes: ");
 		for(GROUMNode node : this.nodes)
 			result.append(node.getLabel() + " ");
 		result.append("\r\n");
-		for (GROUMNode node : this.nodes) {
+		/*for (GROUMNode node : this.nodes) {
 			result.append("Node: " + node.getId() + 
 					" - Label: " + node.getLabel() + 
 					"\tLines: " + node.getStartLine() + "-->" + node.getEndLine() + "\r\n");
-		}
+		}*/
 		result.append("Edges:\r\n");
 		HashSet<GROUMNode> nodes = new HashSet<GROUMNode>(this.nodes);
 		LinkedList<GROUMNode> queue = new LinkedList<GROUMNode>();
@@ -409,7 +397,7 @@ public class Fragment {
 		result.append("\r\n--------------------------------------------------\r\n");
 		
 		return result.toString();
-	}*/
+	}
 	
 	public void toDot(String path, String name) {
 		DotGraph dg = toDotGraph();
@@ -464,6 +452,15 @@ public class Fragment {
 				if (ch >= 128)
 					label += "*";
 			}
+
+			// 正規化可能でなければノードのラベル値を付与
+			if(node.getIsNormalized() && node.getIsNormalizeValid()){
+				String nodeLabel = node.getOriginalLabel();
+				nodeLabel = nodeLabel.replace("\"", "\\\"");
+				if(nodeLabel != null && !nodeLabel.isEmpty()){
+					label += ":" + nodeLabel;
+				}
+			}
 			add(subgraphs[node.getVersion()], dg, id, node.getType(), new String[]{"label", "a", "s", "l"}, new String[]{label, ""+((int)node.getAstType()), ""+buildValue(node.getStarts()), ""+buildValue(node.getLengths())});
 		}
 		subgraphs[0].append(dg.addSubgraphLabel("Old"));
@@ -509,7 +506,7 @@ public class Fragment {
 			values[values.length-1] = DotGraph.SHAPE_BOX;
 		else
 			values[values.length-1] = DotGraph.SHAPE_ELLIPSE;
-		graph.append(dg.addNode(id, names, values));
+		graph.append(DotGraph.addNode(id, names, values));
 	}
 	
 	public void delete() {

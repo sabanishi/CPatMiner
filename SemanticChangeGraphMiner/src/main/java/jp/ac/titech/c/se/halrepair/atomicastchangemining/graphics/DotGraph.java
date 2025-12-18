@@ -49,7 +49,7 @@ public class DotGraph {
 		return "subgraph " + name + " {\n";
 	}
 	
-	public String addNode(int id, String[] names, String[] values) {
+	public static String addNode(int id, String[] names, String[] values) {
 		StringBuffer buf = new StringBuffer();
 		buf.append(id + " [" + names[0] + "=\"" + values[0] + "\"");
 		for (int i = 1; i < names.length; i++) {

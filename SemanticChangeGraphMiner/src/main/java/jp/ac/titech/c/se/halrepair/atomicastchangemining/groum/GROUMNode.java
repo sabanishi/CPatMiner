@@ -4,6 +4,7 @@ import java.util.*;
 
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.change.CASTNode;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.change.ChangeNode;
+import jp.ac.titech.c.se.halrepair.atomicastchangemining.change.NormalizeType;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.InfixExpression;
 
@@ -90,11 +91,40 @@ public class GROUMNode {
 	private HashSet<GROUMEdge> outEdges = new HashSet<GROUMEdge>();
 
 	private List<CASTNode> cAstNodeList;
-	private boolean isNormalized = false;
-
 	public List<CASTNode> getCAstNodeList(){
 		return cAstNodeList;
 	}
+
+	// 以下、正規化に関する追加フィールド
+	// 正規化前の値
+	private String originalLabel;
+	public String getOriginalLabel(){
+		return originalLabel;
+	}
+
+	// 正規化を行えるかどうか
+	private boolean isNormalized = false;
+	// 正規化の種類
+	private NormalizeType normalizeType = NormalizeType.None;
+	// 正規化が妥当かどうか
+	private boolean isNormalizeValid = true;
+
+	public boolean getIsNormalized() {
+		return isNormalized;
+	}
+
+	public NormalizeType getNormalizeType() {
+		return normalizeType;
+	}
+
+	public void setIsNormalizeValid(boolean isValid) {
+		this.isNormalizeValid = isValid;
+	}
+
+	public boolean getIsNormalizeValid() {
+		return isNormalizeValid;
+	}
+
 
 	public GROUMNode(ChangeNode node, List<CASTNode> cAstNode) {
 		this.cAstNodeList = cAstNode;
@@ -117,7 +147,6 @@ public class GROUMNode {
 				if (isInvocation(this.astType)) {
 					// メソッド呼び出しの場合
 					this.label = node.getDataName() + "(" + this.getDataType() + ")";
-					this.isNormalized = true;
 				} else if (this.astType == ASTNode.INFIX_EXPRESSION) {
 					char cl = (char) (infixExpressionLables.get(node.getLabel()) + 128);
 					this.label = String.valueOf(cl);
@@ -137,18 +166,16 @@ public class GROUMNode {
 				this.type = TYPE_FIELD;
 				this.isNormalized = true;
 				if (isLiteral()) {
+					this.normalizeType = NormalizeType.Literal;
+					this.originalLabel = "\""+ node.getDataName() + "\"";
 					// リテラルの場合
 					this.label = ASTNode.nodeClassForType(this.astType).getSimpleName();
-
-					// CASTNodeに正規化したことを伝える
-					for(CASTNode castNode : cAstNodeList){
-						castNode.setNormalizedLabel(label);
-					}
-
 				}else{
 					// 変数の場合
 					this.astType = ASTNode.SIMPLE_NAME;
+					this.originalLabel = node.getDataName();
 					this.label = String.valueOf(this.astType);
+					this.normalizeType = NormalizeType.Variable;
 				}
 				break;
 			default:
@@ -169,6 +196,11 @@ public class GROUMNode {
 		this.dataName = node.dataName;
 		this.dataType = node.dataType;
 		this.cAstNodeList = new ArrayList<>();
+		this.isNormalized = node.isNormalized;
+		this.normalizeType = node.normalizeType;
+		this.originalLabel = node.originalLabel;
+		this.isNormalizeValid = node.isNormalizeValid;
+
 		for(CASTNode castNode : node.cAstNodeList){
 			this.cAstNodeList.add(castNode);
 			castNode.setGroumNode(this);

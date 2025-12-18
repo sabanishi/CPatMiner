@@ -20,7 +20,7 @@ public class GraphSandbox {
 
     @Test
     public void test() throws Exception {
-        GROUMGraph g = ReadGraph.read(0);
+        GROUMGraph g = ReadGraph.read(1);
 
         CASTNode before = g.getChangeGraph().getBeforeAST();
         CASTNode after = g.getChangeGraph().getAfterAST();
@@ -30,7 +30,7 @@ public class GraphSandbox {
         System.out.println("[before]");
         System.out.println(g.getRawText(true));
         System.out.println("=====================================");
-        /*ystem.out.println("[before(normalize)]");
+        /*System.out.println("[before(normalize)]");
         System.out.println(g.getNormalizedText(true));
         System.out.println("=====================================");*/
         System.out.println("[after]");

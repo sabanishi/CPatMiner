@@ -1,14 +1,12 @@
 package jp.ac.titech.c.se.halrepair.atomicastchangemining.groum;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.change.CASTNode;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.change.ChangeEdge;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.change.ChangeGraph;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.change.ChangeNode;
+import jp.ac.titech.c.se.halrepair.atomicastchangemining.graphics.DotGraph;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.mining.Fragment;
 import org.eclipse.jdt.core.dom.ASTNode;
 
@@ -257,5 +255,71 @@ public class GROUMGraph {
 		}else{
 			return changeGraph.getAfterAST().makeNormalizeText(changeGraph.getAfterRawText());
 		}
+	}
+
+	// 同一パターンなら同じになるテキストを生成する
+	public String makeEqualableKey(){
+		StringBuilder[] subgraphs = new StringBuilder[2];
+		subgraphs[0] = new StringBuilder();
+		subgraphs[1] = new StringBuilder();
+		HashMap<GROUMNode, Integer> ids = new HashMap<GROUMNode, Integer>();
+		// add nodes
+		int id = 0;
+		for(GROUMNode node : nodes) {
+			id++;
+			ids.put(node, id);
+			String label = node.getLabel();
+			if (node.getType() == GROUMNode.TYPE_ACTION) {
+				if (!node.isInvocation()) {
+					if (label.length() == 1 && label.charAt(0) >= 128)
+						label = ASTNode.nodeClassForType(node.getAstType()).getSimpleName() + ":" + ((char) (label.charAt(0) - 128));
+					else
+						label = ASTNode.nodeClassForType(node.getAstType()).getSimpleName();
+				} else if (label.length() == 1 && label.charAt(0) < 'a') {
+					try {
+						label = ASTNode.nodeClassForType(node.getAstType()).getSimpleName();
+					} catch (IllegalArgumentException e) {}
+				}
+			} else if (label.length() == 1) {
+				label = ASTNode.nodeClassForType(node.getAstType()).getSimpleName();
+				char ch = label.charAt(0);
+				if (ch >= 128)
+					label += "*";
+			}
+
+			// 正規化可能でなければノードのラベル値を付与
+			if(node.getIsNormalized() && !node.getIsNormalizeValid()){
+				String nodeLabel = node.getOriginalLabel();
+				nodeLabel = nodeLabel.replace("\"", "\\\"");
+				if(nodeLabel != null && !nodeLabel.isEmpty()){
+					label += ":" + nodeLabel;
+				}
+			}
+			add(subgraphs[node.getVersion()], id, node.getType(), new String[]{"label", "a", "s", "l"}, new String[]{label, ""+((int)node.getAstType()), ""+buildValue(node.getStarts()), ""+buildValue(node.getLengths())});
+		}
+
+		return subgraphs[0].toString() + "###" + subgraphs[1].toString();
+	}
+
+	private String buildValue(int[] a) {
+		if (a == null || a.length == 0)
+			return "";
+		String s = "" + a[0];
+		for (int i = 1; i < a.length; i++)
+			s += "," + a[i];
+		return s;
+	}
+
+	private void add(StringBuilder graph, int id, int nodeType, String[] names, String[] values) {
+		names = Arrays.copyOf(names, names.length+1);
+		values = Arrays.copyOf(values, values.length+1);
+		names[names.length-1] = "shape";
+		if(nodeType == GROUMNode.TYPE_CONTROL)
+			values[values.length-1] = DotGraph.SHAPE_DIAMOND;
+		else if (nodeType == GROUMNode.TYPE_ACTION)
+			values[values.length-1] = DotGraph.SHAPE_BOX;
+		else
+			values[values.length-1] = DotGraph.SHAPE_ELLIPSE;
+		graph.append(DotGraph.addNode(id, names, values));
 	}
 }

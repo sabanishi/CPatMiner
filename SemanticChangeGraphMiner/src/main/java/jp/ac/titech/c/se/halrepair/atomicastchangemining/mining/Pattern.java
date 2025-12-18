@@ -39,6 +39,16 @@ public class Pattern {
 	
 	public void add2Lattice(ArrayList<Lattice> lattices) {
 		setId();
+		Lattice l = choiceLattice(lattices);
+		l.add(this);
+	}
+
+	public void remove2Lattice(ArrayList<Lattice> lattices){
+		Lattice l = choiceLattice(lattices);
+		l.remove(this);
+	}
+
+	private Lattice choiceLattice(ArrayList<Lattice> lattices) {
 		Lattice l = null;
 		if (lattices.size() < size) {
 			int s = size - lattices.size();
@@ -48,9 +58,11 @@ public class Pattern {
 				lattices.add(l);
 				s--;
 			}
-		} else
+		} else{
 			l = lattices.get(size - 1);
-		l.add(this);
+		}
+
+		return l;
 	}
 	
 	public int getId() {
@@ -181,4 +193,5 @@ public class Pattern {
 	public boolean isAChange() {
 		return this.representative.isAChange();
 	}
+
 }

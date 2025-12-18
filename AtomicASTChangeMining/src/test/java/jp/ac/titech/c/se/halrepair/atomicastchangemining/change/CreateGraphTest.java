@@ -44,11 +44,11 @@ public class CreateGraphTest {
 
             // AST出力
             //System.out.println( cg.getBeforeAST().printTree());
-            System.out.println(cg.getAfterAST().printTree());
+            //System.out.println(cg.getAfterAST().printTree());
 
-            for(ChangeNode node : cg.getNodes()){
+            /*for(ChangeNode node : cg.getNodes()){
                 System.out.println(node.getLabel() + " : " + ASTNode.nodeClassForType(node.getAstNodeType()));
-            }
+            }*/
 
             DotGraph dg = new DotGraph(cg);
             String objectName = OutputPath + OutputFileName + "_" + i;
@@ -59,6 +59,7 @@ public class CreateGraphTest {
             System.out.println(objectName);
             dg.toGraphics(objectName,"png");
             FileIO.writeObjectToFile(cg, objectName + ".dat", false);
+            i++;
         }
     }
 

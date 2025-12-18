@@ -5,6 +5,7 @@ package jp.ac.titech.c.se.halrepair.atomicastchangemining.mining;
 
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.groum.GROUMGraph;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.groum.GROUMNode;
+import jp.ac.titech.c.se.halrepair.atomicastchangemining.llm.PatternValidator;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.utils.DirectoryHTML;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.utils.FileIO;
 import jp.ac.titech.c.se.halrepair.atomicastchangemining.utils.JGitUtil;
@@ -73,7 +74,14 @@ public class Miner {
 		return commitName;
 	}
 
-	public ArrayList<GROUMGraph> mine(ArrayList<GROUMGraph> groums, String reposPath) {
+	public ArrayList<GROUMGraph> mine(ArrayList<GROUMGraph> groums, String reposPath){
+		return mine(groums, reposPath, null);
+	}
+
+	private static int id = 0;
+
+	public ArrayList<GROUMGraph> mine(ArrayList<GROUMGraph> groums, String reposPath, String tmpPrintPath) {
+		id=0;
 		this.reposPath = reposPath;
 		for (GROUMGraph groum : groums) {
 			groum.deleteAssignmentNodes();
@@ -113,7 +121,7 @@ public class Miner {
 		System.out.println("Got all first pairs");
 
 		for (String label : nodesOfLabel.keySet()) {
-			System.out.println("Processing label: " +  label);
+			//System.out.println("Processing label: " +  label);
 			HashSet<GROUMNode[]> pairs = nodesOfLabel.get(label);
 			HashSet<Fragment> fragments = new HashSet<>();
 			for (GROUMNode[] pair : pairs) {
@@ -122,10 +130,38 @@ public class Miner {
 			}
 			// PDGの大きさが1のパターンを生成し、拡張する
 			Pattern p = new Pattern(fragments, fragments.size());
-			System.out.println("Extending pattern " + p.getId() + " of size " + p.getSize() + " with freq " + p.getFreq());
-			extend(p);
+			//PrintTmpPattern(p, tmpPrintPath, id);
+			//System.out.println("Extending pattern " + p.getId() + " of size " + p.getSize() + " with freq " + p.getFreq());
+			extend(p, tmpPrintPath);
 		}
 		System.out.println("Done mining level " + this.level);
+
+		// LLMに問い合わせを行い、パターンの分解を行う
+		HashSet<Pattern> newPatterns = new HashSet<>();
+		HashSet<Pattern> deletedPatterns = new HashSet<>();
+		for (int step = Pattern.minSize; step <= lattices.size(); step++) {
+			Lattice lat = lattices.get(step - 1);
+			ArrayList<ArrayList<String>> patterns = new ArrayList<>();
+			for (Pattern p : lat.getPatterns()) {
+				HashSet<Pattern> dissolvedPattern = new HashSet<>();
+				boolean isValidate = PatternValidator.isPatternValid(p, dissolvedPattern);
+				if(!isValidate){
+					deletedPatterns.add(p);
+					newPatterns.addAll(dissolvedPattern);
+				}
+			}
+		}
+
+		for (Pattern p : deletedPatterns) {
+			System.out.println("Removing pattern " + p.getId() + " of size " + p.getSize() + " with freq " + p.getFreq());
+			p.remove2Lattice(lattices);
+		}
+
+		for (Pattern p : newPatterns) {
+			System.out.println("Adding new pattern " + p.getId() + " of size " + p.getSize() + " with freq " + p.getFreq());
+			p.add2Lattice(lattices);
+		}
+
 		Lattice.filter(lattices);
 		System.out.println("Done filtering level " + this.level);
 
@@ -702,7 +738,7 @@ public class Miner {
 			pattern.add2Lattice(lattices);
 	}
 	
-	private void extend(Pattern pattern) {
+	private void extend(Pattern pattern, String tmpPrintPath) {
 		// HashMapのkey(String型) = 〇〇というラベルのノードを追加して拡張する
 		// HashMapのvalueのkey(Fragment型) = このラベルで拡張できるFragment
 		// HashMapのvalueのvalue(HashSet<ArrayList<GROUMNode>>型) = 追加するノードの組み合わせの集合
@@ -755,8 +791,10 @@ public class Miner {
 		if (xfreq >= Pattern.minFreq) {
 			// 十分に頻度が高い拡張を行えた時、拡張を継続する
 			Pattern xp = new Pattern(group, xfreq);
+			id++;
+			//PrintTmpPattern(xp, tmpPrintPath, id);
 			pattern.clear();
-			extend(xp);
+			extend(xp, tmpPrintPath);
 			//System.out.println("}");
 		} else if (pattern.isAChange()){
 			// どのラベルで拡張してもminFreqを満たす頻度のパターンが得られない時、ここで拡張を終了する
@@ -902,5 +940,10 @@ public class Miner {
 			i++;
 		}
 		group.retainAll(l);
+	}
+
+	private static void PrintTmpPattern(Pattern pattern, String tmpPrintPath, int id){
+		Fragment f = pattern.getRepresentative();
+		f.toDot(tmpPrintPath, id+"");
 	}
 }
